@@ -1,5 +1,5 @@
 mod transaction;
-mod utils;
+mod types;
 
 mod canteen;
 

@@ -1,4 +1,4 @@
-use super::utils::Date;
+use super::types::Date;
 use crate::entity::{
     canteen_data::{self, Entity as CanteenData},
     canteen_menus::{self, Entity as CanteenMenus},
