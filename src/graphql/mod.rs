@@ -1,8 +1,10 @@
+mod transaction;
 mod utils;
 
 mod canteen;
 
 use self::canteen::CanteenQuery;
+use self::transaction::Transaction;
 use crate::database;
 use async_graphql::{EmptyMutation, EmptySubscription, MergedObject};
 
@@ -15,5 +17,6 @@ pub async fn create_schema() -> Schema {
     let db = database::connect().await;
     Schema::build(Query::default(), EmptyMutation, EmptySubscription)
         .data(db)
+        .extension(Transaction)
         .finish()
 }
