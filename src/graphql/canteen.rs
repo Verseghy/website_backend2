@@ -1,9 +1,10 @@
-use super::utils::{Date, Maybe};
+use super::utils::Date;
 use crate::entity::{
     canteen_data::{self, Entity as CanteenData},
     canteen_menus::{self, Entity as CanteenMenus},
     canteen_pivot_menus_data,
 };
+use crate::utils::Maybe;
 use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
 use chrono::{NaiveDate, Weekday};
 use sea_orm::{
@@ -76,8 +77,7 @@ impl CanteenQuery {
     async fn canteen(&self, ctx: &Context<'_>, year: i32, week: i32) -> Result<Vec<Canteen>> {
         let db: &DatabaseConnection = ctx.data().unwrap();
 
-        let mut query = CanteenData::find()
-            .select_only();
+        let mut query = CanteenData::find().select_only();
 
         if ctx.look_ahead().field("id").exists() || ctx.look_ahead().field("menus").exists() {
             query = query.column(canteen_data::Column::Id);

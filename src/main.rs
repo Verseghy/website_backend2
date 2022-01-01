@@ -1,6 +1,7 @@
 mod database;
 mod entity;
 mod graphql;
+mod utils;
 
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use hyper::service::{make_service_fn, service_fn};
