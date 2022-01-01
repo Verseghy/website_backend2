@@ -2101,6 +2101,7 @@ version = "0.1.0"
 dependencies = [
  "async-graphql",
  "chrono",
+ "dotenv",
  "hyper",
  "sea-orm",
  "serde_json",

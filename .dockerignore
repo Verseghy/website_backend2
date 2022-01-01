@@ -1,0 +1,6 @@
+target
+.git
+.gitignore
+.dockerignore
+Dockerfile
+migrations
