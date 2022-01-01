@@ -1,4 +1,4 @@
-use super::utils::{Date, Optional};
+use super::utils::{Date, Maybe};
 use crate::entity::{
     canteen_data::{self, Entity as CanteenData},
     canteen_menus::{self, Entity as CanteenMenus},
@@ -14,9 +14,9 @@ use sea_orm::{
 
 #[derive(SimpleObject, Debug)]
 pub struct Menu {
-    id: Optional<u32>,
-    menu: Optional<String>,
-    r#type: Optional<u16>,
+    id: Maybe<u32>,
+    menu: Maybe<String>,
+    r#type: Maybe<u16>,
 }
 
 impl FromQueryResult for Menu {
@@ -33,7 +33,7 @@ impl FromQueryResult for Menu {
 #[graphql(complex)]
 pub struct Canteen {
     id: u32,
-    date: Optional<Date>,
+    date: Maybe<Date>,
 }
 
 #[ComplexObject]

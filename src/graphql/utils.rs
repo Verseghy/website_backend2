@@ -6,7 +6,7 @@ use async_graphql::{
 use chrono::NaiveDate;
 use core::str::FromStr;
 use sea_orm::{QueryResult, TryGetError, TryGetable};
-use std::borrow::Cow;
+use std::{borrow::Cow, ops::Deref};
 
 #[derive(Debug)]
 pub struct Date(pub NaiveDate);
@@ -38,22 +38,35 @@ impl TryGetable for Date {
 }
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
-pub enum Optional<T> {
-    Some(T),
-    None,
+pub struct Maybe<T> {
+    option: Option<T>,
 }
 
-impl<T: TryGetable> TryGetable for Optional<T> {
+impl<T> Maybe<T> {
+    pub fn new(option: Option<T>) -> Self {
+        Self { option }
+    }
+}
+
+impl<T> Deref for Maybe<T> {
+    type Target = Option<T>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.option
+    }
+}
+
+impl<T: TryGetable> TryGetable for Maybe<T> {
     fn try_get(res: &QueryResult, pre: &str, col: &str) -> Result<Self, TryGetError> {
         match T::try_get(res, pre, col) {
-            Ok(value) => Ok(Optional::Some(value)),
-            Err(_) => Ok(Optional::None),
+            Ok(value) => Ok(Maybe::new(Some(value))),
+            Err(_) => Ok(Maybe::new(None)),
         }
     }
 }
 
 #[async_trait]
-impl<T: OutputType + Sync> OutputType for Optional<T> {
+impl<T: OutputType + Sync> OutputType for Maybe<T> {
     fn type_name() -> Cow<'static, str> {
         T::type_name()
     }
@@ -72,7 +85,7 @@ impl<T: OutputType + Sync> OutputType for Optional<T> {
         ctx: &ContextSelectionSet<'_>,
         field: &Positioned<Field>,
     ) -> ServerResult<Value> {
-        if let Optional::Some(inner) = self {
+        if let Some(inner) = self.deref() {
             match OutputType::resolve(inner, ctx, field).await {
                 Ok(value) => Ok(value),
                 Err(err) => {
