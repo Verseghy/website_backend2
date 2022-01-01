@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  database:
+    image: mysql:5.7
+    environment:
+      - "MYSQL_DATABASE=backend"
+      - "MYSQL_USER=backend"
+      - "MYSQL_PASSWORD=password"
+      - "MYSQL_ROOT_PASSWORD=secret"
+    ports:
+        - "33061:3306"
