@@ -11,6 +11,7 @@ use sea_orm::{
     query::{Order, QueryOrder, QuerySelect},
     DatabaseConnection, FromQueryResult, JoinType,
 };
+use std::ops::Deref;
 
 #[derive(SimpleObject, Debug)]
 pub struct Menu {
@@ -32,7 +33,7 @@ impl FromQueryResult for Menu {
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
 pub struct Canteen {
-    id: u32,
+    id: Maybe<u32>,
     date: Maybe<Date>,
 }
 
@@ -54,7 +55,7 @@ impl Canteen {
         }
 
         Ok(query
-            .filter(canteen_pivot_menus_data::Column::DataId.eq(self.id))
+            .filter(canteen_pivot_menus_data::Column::DataId.eq(self.id.deref().unwrap()))
             .join_rev(
                 JoinType::Join,
                 canteen_pivot_menus_data::Relation::Menu.def(),
@@ -76,8 +77,11 @@ impl CanteenQuery {
         let db: &DatabaseConnection = ctx.data().unwrap();
 
         let mut query = CanteenData::find()
-            .select_only()
-            .column(canteen_data::Column::Id);
+            .select_only();
+
+        if ctx.look_ahead().field("id").exists() || ctx.look_ahead().field("menus").exists() {
+            query = query.column(canteen_data::Column::Id);
+        }
 
         if ctx.look_ahead().field("date").exists() {
             query = query.column(canteen_data::Column::Date);
