@@ -1,21 +1,21 @@
 mod database;
 mod entity;
 mod graphql;
-mod service;
 mod utils;
 
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use hyper::{body::Buf, Body, Method, Request, Response, Server, StatusCode};
 use std::{convert::Infallible, net::SocketAddr, time::Duration};
 use tower::make::Shared;
+use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
 
 use crate::graphql::create_schema;
 use crate::graphql::Schema;
-use crate::service::GraphQLService;
 
 const GRAPHQL_PATH: &str = "/graphql";
 
-async fn handler(req: Request<Body>, schema: Schema) -> Result<Response<Body>, Infallible> {
+async fn handler(req: Request<Body>) -> Result<Response<Body>, Infallible> {
+    let schema = req.extensions().get::<Schema>().unwrap().clone();
     let mut res = Response::new(Body::empty());
 
     match (req.method(), req.uri().path()) {
@@ -47,7 +47,7 @@ async fn handler(req: Request<Body>, schema: Schema) -> Result<Response<Body>, I
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::INFO)
+        .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()
         .init();
 
@@ -56,7 +56,9 @@ async fn main() {
 
     let service = tower::ServiceBuilder::new()
         .timeout(Duration::from_secs(30))
-        .service(GraphQLService::new(handler, schema));
+        .layer(TraceLayer::new_for_http())
+        .layer(AddExtensionLayer::new(schema))
+        .service_fn(handler);
 
     Server::bind(&addr)
         .serve(Shared::new(service))
