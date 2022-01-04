@@ -38,6 +38,12 @@ async fn handler(req: Request<Body>) -> Result<Response<Body>, Infallible> {
                 }
             }
         }
+        (&Method::GET, "/readiness") => {
+            *res.status_mut() = StatusCode::OK;
+        }
+        (&Method::GET, "/liveness") => {
+            *res.status_mut() = StatusCode::OK;
+        }
         _ => *res.status_mut() = StatusCode::NOT_FOUND,
     }
 
