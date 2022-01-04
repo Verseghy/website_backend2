@@ -47,7 +47,7 @@ impl Canteen {
         let mut query = CanteenMenus::find().select_only();
 
         select_columns!(ctx, query,
-            "id" => canteen_data::Column::Id,
+            "id" => canteen_menus::Column::Id,
             "menu" => canteen_menus::Column::Menu,
             "type" => canteen_menus::Column::Type);
 
