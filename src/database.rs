@@ -12,5 +12,8 @@ fn get_db_uri() -> Result<String> {
 
 pub async fn connect() -> DatabaseConnection {
     let uri = get_db_uri().expect("Could not create database URI");
-    Database::connect(uri).await.unwrap()
+    tracing::info!("Trying to connect to database");
+    let db = Database::connect(uri).await.unwrap();
+    tracing::info!("Connected to database");
+    db
 }

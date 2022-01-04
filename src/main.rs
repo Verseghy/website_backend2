@@ -7,7 +7,7 @@ use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use hyper::{body::Buf, Body, Method, Request, Response, Server, StatusCode};
 use std::{convert::Infallible, net::SocketAddr, time::Duration};
 use tower::make::Shared;
-use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
+use tower_http::add_extension::AddExtensionLayer;
 
 use crate::graphql::create_schema;
 use crate::graphql::Schema;
@@ -49,6 +49,8 @@ async fn main() {
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()
+        .with_env_filter("warn,website_backend=debug")
+        .compact()
         .init();
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
@@ -56,10 +58,10 @@ async fn main() {
 
     let service = tower::ServiceBuilder::new()
         .timeout(Duration::from_secs(30))
-        .layer(TraceLayer::new_for_http())
         .layer(AddExtensionLayer::new(schema))
         .service_fn(handler);
 
+    tracing::info!("Listening on port {}", addr.port());
     Server::bind(&addr)
         .serve(Shared::new(service))
         .await

@@ -15,8 +15,11 @@ pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>
 
 pub async fn create_schema() -> Schema {
     let db = database::connect().await;
-    Schema::build(Query::default(), EmptyMutation, EmptySubscription)
+    let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
         .data(db)
         .extension(Transaction)
-        .finish()
+        .finish();
+
+    tracing::info!("Schema created");
+    schema
 }
