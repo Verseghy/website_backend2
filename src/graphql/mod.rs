@@ -3,15 +3,17 @@ mod types;
 
 mod canteen;
 mod colleagues;
-
+mod events;
 use self::canteen::CanteenQuery;
 use self::colleagues::ColleaguesQuery;
+use self::events::EventsQuery;
+
 use self::transaction::Transaction;
 use crate::database;
 use async_graphql::{EmptyMutation, EmptySubscription, MergedObject};
 
 #[derive(MergedObject, Default)]
-pub struct Query(CanteenQuery, ColleaguesQuery);
+pub struct Query(CanteenQuery, ColleaguesQuery, EventsQuery);
 
 pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>;
 
