@@ -1,7 +1,7 @@
 use std::io::{Error, ErrorKind, Result};
 use tokio::fs::read_to_string;
 
-pub async fn num_thread() -> Result<u64> {
+pub async fn num_threads() -> Result<u64> {
     count().await
 }
 
