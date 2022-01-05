@@ -5,7 +5,7 @@ pub async fn num_threads() -> Result<u64> {
     count().await
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 async fn count() -> Result<u64> {
     let stat = read_to_string("/proc/self/stat").await?;
     stat.split(" ")
@@ -21,7 +21,7 @@ async fn count() -> Result<u64> {
         })
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 async fn count() -> Result<u64> {
     Ok(1)
 }
