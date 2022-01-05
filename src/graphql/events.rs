@@ -43,11 +43,14 @@ impl EventsQuery {
             "createdAt" => Column::CreatedAt,
             "updatedAt" => Column::UpdatedAt);
 
-        let start = NaiveDate::from_ymd(year, month, 1).and_hms(0, 0, 0);
+        let start = NaiveDate::from_ymd_opt(year, month, 1)
+            .ok_or(Error::new("invalid date"))?
+            .and_hms(0, 0, 0);
+
         let end = if month < 12 {
-            NaiveDate::from_ymd(year, month + 1, 1)
+            NaiveDate::from_ymd_opt(year, month + 1, 1).ok_or(Error::new("invalid date"))?
         } else {
-            NaiveDate::from_ymd(year + 1, 1, 1)
+            NaiveDate::from_ymd_opt(year + 1, 1, 1).ok_or(Error::new("invalid date"))?
         }
         .and_hms(0, 0, 0);
 
