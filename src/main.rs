@@ -12,6 +12,7 @@ use tower_http::add_extension::AddExtensionLayer;
 
 use crate::graphql::create_schema;
 use crate::graphql::Schema;
+use crate::utils::num_thread;
 
 const GRAPHQL_PATH: &str = "/graphql";
 
@@ -43,7 +44,15 @@ async fn handler(req: Request<Body>) -> Result<Response<Body>, Infallible> {
             *res.status_mut() = StatusCode::OK;
         }
         (&Method::GET, "/liveness") => {
-            *res.status_mut() = StatusCode::OK;
+            if let Ok(threads) = num_thread().await {
+                if threads < 10000 {
+                    *res.status_mut() = StatusCode::OK;
+                } else {
+                    *res.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
+                }
+            } else {
+                *res.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
+            }
         }
         _ => *res.status_mut() = StatusCode::NOT_FOUND,
     }
