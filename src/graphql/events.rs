@@ -20,8 +20,6 @@ pub struct Event {
     title: Maybe<String>,
     description: Maybe<String>,
     color: Maybe<String>,
-    created_at: Maybe<DateTime>,
-    updated_at: Maybe<DateTime>,
 }
 
 #[derive(Default)]
@@ -39,9 +37,7 @@ impl EventsQuery {
             "dateTo" => Column::DateTo,
             "title" => Column::Title,
             "description" => Column::Description,
-            "color" => Column::Color,
-            "createdAt" => Column::CreatedAt,
-            "updatedAt" => Column::UpdatedAt);
+            "color" => Column::Color);
 
         let start = NaiveDate::from_ymd_opt(year, month, 1)
             .ok_or(Error::new("invalid date"))?
