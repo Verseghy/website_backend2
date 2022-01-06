@@ -1,5 +1,5 @@
 use crate::{graphql::Schema, utils::num_threads, GRAPHQL_PATH};
-use actix_web::{web, HttpResponse};
+use actix_web::{http::StatusCode, web, HttpResponse};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 
@@ -21,11 +21,11 @@ pub async fn readiness() -> HttpResponse {
 
 pub async fn liveness() -> HttpResponse {
     if let Ok(threads) = num_threads().await {
+        tracing::debug!("Liveness thread count: {}", threads);
         if threads < 10000 {
-            tracing::debug!("Liveness thread count: {}", threads);
-            return HttpResponse::Ok().body("");
+            return HttpResponse::new(StatusCode::OK);
         }
     }
 
-    HttpResponse::InternalServerError().body("")
+    HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR)
 }
