@@ -40,13 +40,13 @@ impl EventsQuery {
             "color" => Column::Color);
 
         let start = NaiveDate::from_ymd_opt(year, month, 1)
-            .ok_or(Error::new("invalid date"))?
+            .ok_or_else(|| Error::new("invalid date"))?
             .and_hms(0, 0, 0);
 
         let end = if month < 12 {
-            NaiveDate::from_ymd_opt(year, month + 1, 1).ok_or(Error::new("invalid date"))?
+            NaiveDate::from_ymd_opt(year, month + 1, 1).ok_or_else(|| Error::new("invalid date"))?
         } else {
-            NaiveDate::from_ymd_opt(year + 1, 1, 1).ok_or(Error::new("invalid date"))?
+            NaiveDate::from_ymd_opt(year + 1, 1, 1).ok_or_else(|| Error::new("invalid date"))?
         }
         .and_hms(0, 0, 0);
 

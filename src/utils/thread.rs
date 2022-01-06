@@ -8,9 +8,9 @@ pub async fn num_threads() -> Result<u64> {
 #[cfg(any(target_os = "linux", target_os = "freebsd"))]
 async fn count() -> Result<u64> {
     let stat = read_to_string("/proc/self/stat").await?;
-    stat.split(" ")
+    stat.split(' ')
         .nth(19)
-        .ok_or(Error::new(
+        .ok_or_else(|| Error::new(
             ErrorKind::InvalidData,
             "No 20th element in /proc/stat",
         ))
