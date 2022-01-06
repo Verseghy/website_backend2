@@ -10,10 +10,7 @@ async fn count() -> Result<u64> {
     let stat = read_to_string("/proc/self/stat").await?;
     stat.split(' ')
         .nth(19)
-        .ok_or_else(|| Error::new(
-            ErrorKind::InvalidData,
-            "No 20th element in /proc/stat",
-        ))
+        .ok_or_else(|| Error::new(ErrorKind::InvalidData, "No 20th element in /proc/stat"))
         .and_then(|count| {
             count
                 .parse::<u64>()
