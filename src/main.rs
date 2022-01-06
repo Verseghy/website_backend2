@@ -31,7 +31,6 @@ async fn graphql_playground() -> impl Responder {
 }
 
 async fn readiness() -> HttpResponse {
-    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
     HttpResponse::Ok().body("")
 }
 
