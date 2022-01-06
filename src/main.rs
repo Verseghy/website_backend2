@@ -1,49 +1,18 @@
 mod database;
 mod entity;
 mod graphql;
+mod http;
 mod utils;
 
+use crate::{graphql::create_schema, http::handlers};
 use actix_web::{
     web::{self, Data},
-    App, HttpResponse, HttpServer, Responder,
+    App, HttpServer,
 };
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use std::io;
-
-use crate::graphql::create_schema;
-use crate::graphql::Schema;
-use crate::utils::num_threads;
 
 const GRAPHQL_PATH: &str = "/graphql";
 const PORT: u16 = 3000;
-
-async fn graphql(schema: Data<Schema>, request: GraphQLRequest) -> GraphQLResponse {
-    schema.execute(request.into_inner()).await.into()
-}
-
-async fn graphql_playground() -> impl Responder {
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(playground_source(GraphQLPlaygroundConfig::new(
-            GRAPHQL_PATH,
-        )))
-}
-
-async fn readiness() -> HttpResponse {
-    HttpResponse::Ok().body("")
-}
-
-async fn liveness() -> HttpResponse {
-    if let Ok(threads) = num_threads().await {
-        if threads < 10000 {
-            tracing::debug!("Liveness thread count: {}", threads);
-            return HttpResponse::Ok().body("");
-        }
-    }
-
-    HttpResponse::InternalServerError().body("")
-}
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -60,10 +29,10 @@ async fn main() -> io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(schema.clone()))
-            .route(GRAPHQL_PATH, web::post().to(graphql))
-            .route(GRAPHQL_PATH, web::get().to(graphql_playground))
-            .route("/readiness", web::get().to(readiness))
-            .route("/liveness", web::get().to(liveness))
+            .route(GRAPHQL_PATH, web::post().to(handlers::graphql))
+            .route(GRAPHQL_PATH, web::get().to(handlers::graphql_playground))
+            .route("/readiness", web::get().to(handlers::readiness))
+            .route("/liveness", web::get().to(handlers::liveness))
     })
     .bind(("0.0.0.0", PORT))?
     .run()
