@@ -5,6 +5,7 @@ use crate::{
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
 use sea_orm::{prelude::*, query::QuerySelect, DatabaseConnection, FromQueryResult};
+use std::cmp::Ordering;
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Colleague {
@@ -37,10 +38,33 @@ impl ColleaguesQuery {
             "image" => Column::Image,
             "category" => Column::Category);
 
-        Ok(query
+        let mut res = query
             .into_model::<Colleague>()
             .all(db)
             .await
-            .map_err(|_| Error::new("database error"))?)
+            .map_err(|_| Error::new("database error"))?;
+
+        if ctx.look_ahead().field("name").exists() {
+            res.sort_by(|a, b| {
+                let a = a.name.as_ref().unwrap();
+                let b = b.name.as_ref().unwrap();
+
+                let a_name = if a.starts_with("Dr. ") {
+                    &a[4..]
+                } else {
+                    &a[..]
+                };
+
+                let b_name = if b.starts_with("Dr. ") {
+                    &b[4..]
+                } else {
+                    &b[..]
+                };
+
+                a_name.cmp(b_name)
+            });
+        }
+
+        Ok(res)
     }
 }
