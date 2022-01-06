@@ -11,12 +11,11 @@ pub struct Model {
     pub name: String,
     pub title: String,
     pub slug: String,
-    #[sea_orm(column_type = "Text", nullable)]
-    pub content: Option<String>,
-    #[sea_orm(column_type = "Custom(\"LONGTEXT\".to_owned())", nullable)]
-    pub extras: Option<String>,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
+    #[sea_orm(column_type = "Text")]
+    pub content: String,
+    pub extras: Json,
+    pub created_at: DateTime,
+    pub updated_at: DateTime,
     pub deleted_at: Option<DateTime>,
 }
 
