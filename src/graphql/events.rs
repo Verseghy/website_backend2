@@ -31,13 +31,7 @@ impl EventsQuery {
         let db: &DatabaseConnection = ctx.data().unwrap();
         let mut query = EventsData::find().select_only();
 
-        select_columns!(ctx, query,
-            "id" => Column::Id,
-            "dateFrom" => Column::DateFrom,
-            "dateTo" => Column::DateTo,
-            "title" => Column::Title,
-            "description" => Column::Description,
-            "color" => Column::Color);
+        select_columns!(ctx, query, Column);
 
         let start = NaiveDate::from_ymd_opt(year, month, 1)
             .ok_or_else(|| Error::new("invalid date"))?

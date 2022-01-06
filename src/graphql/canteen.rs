@@ -43,13 +43,9 @@ pub struct Canteen {
 impl Canteen {
     async fn menus(&self, ctx: &Context<'_>) -> Result<Vec<Menu>> {
         let db: &DatabaseConnection = ctx.data().unwrap();
-
         let mut query = CanteenMenus::find().select_only();
 
-        select_columns!(ctx, query,
-            "id" => canteen_menus::Column::Id,
-            "menu" => canteen_menus::Column::Menu,
-            "type" => canteen_menus::Column::Type);
+        select_columns!(ctx, query, canteen_menus::Column);
 
         Ok(query
             .filter(canteen_pivot_menus_data::Column::DataId.eq(self.id.deref().unwrap()))
@@ -75,9 +71,8 @@ impl CanteenQuery {
 
         let mut query = CanteenData::find().select_only();
 
-        select_columns!(ctx, query,
-            "id" | "menus" => canteen_data::Column::Id,
-            "date" => canteen_data::Column::Date);
+        select_columns!(ctx, query, canteen_data::Column);
+        select_columns!(ctx, query, "menus" => canteen_data::Column::Id);
 
         let start = NaiveDate::from_isoywd_opt(year, week as u32, Weekday::Mon).unwrap();
         let end = NaiveDate::from_isoywd_opt(year, week as u32, Weekday::Sun).unwrap();

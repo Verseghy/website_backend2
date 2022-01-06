@@ -27,15 +27,7 @@ impl ColleaguesQuery {
         let db: &DatabaseConnection = ctx.data().unwrap();
         let mut query = ColleaguesData::find().select_only();
 
-        select_columns!(ctx, query,
-            "id" => Column::Id,
-            "name" => Column::Name,
-            "jobs" => Column::Jobs,
-            "subjects" => Column::Subjects,
-            "roles" => Column::Roles,
-            "awards" => Column::Awards,
-            "image" => Column::Image,
-            "category" => Column::Category);
+        select_columns!(ctx, query, Column);
 
         let mut res = query
             .into_model::<Colleague>()
