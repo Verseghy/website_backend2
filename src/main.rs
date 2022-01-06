@@ -9,10 +9,9 @@ use actix_web::{
     web::{self, Data},
     App, HttpServer,
 };
-use std::io;
+use std::{io, net::SocketAddr};
 
 const GRAPHQL_PATH: &str = "/graphql";
-const PORT: u16 = 3000;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -23,9 +22,10 @@ async fn main() -> io::Result<()> {
         .compact()
         .init();
 
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     let schema = create_schema().await;
 
-    tracing::info!("Listening on port {}", PORT);
+    tracing::info!("Listening on port {}", addr.port());
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(schema.clone()))
@@ -34,7 +34,7 @@ async fn main() -> io::Result<()> {
             .route("/readiness", web::get().to(handlers::readiness))
             .route("/liveness", web::get().to(handlers::liveness))
     })
-    .bind(("0.0.0.0", PORT))?
+    .bind(addr)?
     .run()
     .await
 }
