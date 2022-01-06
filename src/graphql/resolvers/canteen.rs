@@ -1,11 +1,13 @@
-use super::types::Date;
-use crate::entity::{
-    canteen_data::{self, Entity as CanteenData},
-    canteen_menus::{self, Entity as CanteenMenus},
-    canteen_pivot_menus_data,
-};
 use crate::select_columns;
 use crate::utils::Maybe;
+use crate::{
+    entity::{
+        canteen_data::{self, Entity as CanteenData},
+        canteen_menus::{self, Entity as CanteenMenus},
+        canteen_pivot_menus_data,
+    },
+    graphql::types::Date,
+};
 use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
 use chrono::{NaiveDate, Weekday};
 use sea_orm::{

@@ -1,6 +1,6 @@
-use super::types::DateTime;
 use crate::{
     entity::events_data::{Column, Entity as EventsData},
+    graphql::types::DateTime,
     select_columns,
     utils::Maybe,
 };
