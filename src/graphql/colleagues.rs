@@ -5,7 +5,6 @@ use crate::{
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
 use sea_orm::{prelude::*, query::QuerySelect, DatabaseConnection, FromQueryResult};
-use std::cmp::Ordering;
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Colleague {
