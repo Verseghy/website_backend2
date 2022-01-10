@@ -16,7 +16,7 @@ pub async fn graphql_playground() -> HttpResponse {
 }
 
 pub async fn readiness() -> HttpResponse {
-    HttpResponse::Ok().body("")
+    HttpResponse::new(StatusCode::OK)
 }
 
 pub async fn liveness() -> HttpResponse {
