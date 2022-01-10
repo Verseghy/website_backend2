@@ -15,7 +15,7 @@ pub struct Colleague {
     pub roles: Maybe<String>,
     pub awards: Maybe<String>,
     pub image: Maybe<String>,
-    pub category: Maybe<i16>,
+    pub category: Maybe<u16>,
 }
 
 #[derive(Default)]
