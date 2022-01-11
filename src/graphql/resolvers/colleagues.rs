@@ -40,17 +40,8 @@ impl ColleaguesQuery {
                 let a = a.name.as_ref().unwrap();
                 let b = b.name.as_ref().unwrap();
 
-                let a_name = if a.starts_with("Dr. ") {
-                    &a[4..]
-                } else {
-                    &a[..]
-                };
-
-                let b_name = if b.starts_with("Dr. ") {
-                    &b[4..]
-                } else {
-                    &b[..]
-                };
+                let a_name = a.strip_prefix("Dr. ").unwrap_or(a);
+                let b_name = a.strip_prefix("Dr. ").unwrap_or(b);
 
                 a_name.cmp(b_name)
             });
