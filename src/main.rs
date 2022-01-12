@@ -24,11 +24,13 @@ async fn main() -> io::Result<()> {
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     let schema = create_schema().await;
+    let database = database::connect().await;
 
     tracing::info!("Listening on port {}", addr.port());
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(schema.clone()))
+            .app_data(Data::new(database.clone()))
             .route(GRAPHQL_PATH, web::post().to(handlers::graphql))
             .route(GRAPHQL_PATH, web::get().to(handlers::graphql_playground))
             .route("/readiness", web::get().to(handlers::readiness))

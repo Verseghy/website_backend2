@@ -2,9 +2,21 @@ use crate::{graphql::Schema, utils::num_threads, GRAPHQL_PATH};
 use actix_web::{http::StatusCode, web, HttpResponse};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
+use sea_orm::{ConnectionTrait, DatabaseConnection};
+use std::sync::Arc;
 
-pub async fn graphql(schema: web::Data<Schema>, request: GraphQLRequest) -> GraphQLResponse {
-    schema.execute(request.into_inner()).await.into()
+pub async fn graphql(
+    database: web::Data<DatabaseConnection>,
+    schema: web::Data<Schema>,
+    request: GraphQLRequest,
+) -> GraphQLResponse {
+    let request = request.into_inner();
+
+    let tx = Arc::new(database.begin().await.unwrap());
+    let res = schema.execute(request.data(Arc::clone(&tx))).await.into();
+    Arc::try_unwrap(tx).unwrap().commit().await.unwrap();
+
+    res
 }
 
 pub async fn graphql_playground() -> HttpResponse {

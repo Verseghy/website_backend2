@@ -2,7 +2,8 @@ use crate::entity::pages::{Column, Entity as Pages};
 use crate::select_columns;
 use crate::utils::Maybe;
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
-use sea_orm::{entity::prelude::*, query::QuerySelect, DatabaseConnection, FromQueryResult};
+use sea_orm::{entity::prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
+use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Page {
@@ -20,7 +21,7 @@ pub struct PagesQuery;
 #[Object]
 impl PagesQuery {
     async fn page(&self, ctx: &Context<'_>, slug: String) -> Result<Option<Page>> {
-        let db: &DatabaseConnection = ctx.data().unwrap();
+        let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = Pages::find().select_only();
 
         select_columns!(ctx, query, Column);
@@ -28,7 +29,7 @@ impl PagesQuery {
         Ok(query
             .filter(Column::Slug.eq(slug))
             .into_model::<Page>()
-            .one(db)
+            .one(db.deref())
             .await
             .map_err(|_| Error::new("database error"))?)
     }

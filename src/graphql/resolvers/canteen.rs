@@ -13,9 +13,9 @@ use chrono::{NaiveDate, Weekday};
 use sea_orm::{
     entity::prelude::*,
     query::{Order, QueryOrder, QuerySelect},
-    DatabaseConnection, FromQueryResult, JoinType,
+    DatabaseTransaction, FromQueryResult, JoinType,
 };
-use std::ops::Deref;
+use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug)]
 pub struct Menu {
@@ -44,7 +44,7 @@ pub struct Canteen {
 #[ComplexObject]
 impl Canteen {
     async fn menus(&self, ctx: &Context<'_>) -> Result<Vec<Menu>> {
-        let db: &DatabaseConnection = ctx.data().unwrap();
+        let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = CanteenMenus::find().select_only();
 
         select_columns!(ctx, query, canteen_menus::Column);
@@ -57,7 +57,7 @@ impl Canteen {
             )
             .order_by(canteen_menus::Column::Type, Order::Asc)
             .into_model::<Menu>()
-            .all(db)
+            .all(db.deref())
             .await
             .map_err(|_| Error::new("database error"))?)
     }
@@ -69,8 +69,7 @@ pub struct CanteenQuery;
 #[Object]
 impl CanteenQuery {
     async fn canteen(&self, ctx: &Context<'_>, year: i32, week: i32) -> Result<Vec<Canteen>> {
-        let db: &DatabaseConnection = ctx.data().unwrap();
-
+        let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = CanteenData::find().select_only();
 
         select_columns!(ctx, query, canteen_data::Column);
@@ -84,7 +83,7 @@ impl CanteenQuery {
             .filter(canteen_data::Column::Date.gte(start))
             .order_by(canteen_data::Column::Date, Order::Asc)
             .into_model::<Canteen>()
-            .all(db)
+            .all(db.deref())
             .await
             .map_err(|_| Error::new("database error"))?)
     }

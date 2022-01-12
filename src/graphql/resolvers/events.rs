@@ -9,8 +9,9 @@ use chrono::NaiveDate;
 use sea_orm::{
     prelude::*,
     query::{Order, QueryOrder, QuerySelect},
-    DatabaseConnection, FromQueryResult,
+    DatabaseTransaction, FromQueryResult,
 };
+use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Event {
@@ -28,7 +29,7 @@ pub struct EventsQuery;
 #[Object]
 impl EventsQuery {
     async fn events(&self, ctx: &Context<'_>, year: i32, month: u32) -> Result<Vec<Event>> {
-        let db: &DatabaseConnection = ctx.data().unwrap();
+        let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = EventsData::find().select_only();
 
         select_columns!(ctx, query, Column);
@@ -49,7 +50,7 @@ impl EventsQuery {
             .filter(Column::DateTo.lt(end))
             .order_by(Column::DateFrom, Order::Asc)
             .into_model::<Event>()
-            .all(db)
+            .all(db.deref())
             .await
             .map_err(|_| Error::new("database error"))?)
     }

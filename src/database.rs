@@ -1,5 +1,5 @@
 use dotenv::{var, Result};
-use sea_orm::{Database, DatabaseConnection};
+use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 
 fn get_db_uri() -> Result<String> {
     let username = var("DB_USERNAME")?;
@@ -12,8 +12,13 @@ fn get_db_uri() -> Result<String> {
 
 pub async fn connect() -> DatabaseConnection {
     let uri = get_db_uri().expect("Could not create database URI");
+
     tracing::info!("Trying to connect to database");
-    let db = Database::connect(uri).await.unwrap();
+
+    let opts = ConnectOptions::new(uri);
+    let db = Database::connect(opts).await.unwrap();
+
     tracing::info!("Connected to database");
+
     db
 }

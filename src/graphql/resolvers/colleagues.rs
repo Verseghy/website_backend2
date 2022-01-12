@@ -4,7 +4,8 @@ use crate::{
     utils::Maybe,
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
-use sea_orm::{prelude::*, query::QuerySelect, DatabaseConnection, FromQueryResult};
+use sea_orm::{prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
+use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Colleague {
@@ -24,14 +25,14 @@ pub struct ColleaguesQuery;
 #[Object]
 impl ColleaguesQuery {
     async fn colleagues(&self, ctx: &Context<'_>) -> Result<Vec<Colleague>> {
-        let db: &DatabaseConnection = ctx.data().unwrap();
+        let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = ColleaguesData::find().select_only();
 
         select_columns!(ctx, query, Column);
 
         let mut res = query
             .into_model::<Colleague>()
-            .all(db)
+            .all(db.deref())
             .await
             .map_err(|_| Error::new("database error"))?;
 
