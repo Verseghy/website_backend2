@@ -1,6 +1,9 @@
 use crate::{graphql::Schema, utils::num_threads, GRAPHQL_PATH};
 use actix_web::{http::StatusCode, web, HttpResponse};
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    Response, ServerError,
+};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use sea_orm::{ConnectionTrait, DatabaseConnection};
 use std::sync::Arc;
@@ -12,11 +15,32 @@ pub async fn graphql(
 ) -> GraphQLResponse {
     let request = request.into_inner();
 
-    let tx = Arc::new(database.begin().await.unwrap());
-    let res = schema.execute(request.data(Arc::clone(&tx))).await.into();
-    Arc::try_unwrap(tx).unwrap().commit().await.unwrap();
+    if request.operation_name == Some("IntrospectionQuery".into()) {
+        return schema.execute(request).await.into();
+    }
 
-    res
+    let res = match database.begin().await {
+        Ok(tx) => {
+            let tx = Arc::new(tx);
+            let res = schema.execute(request.data(Arc::clone(&tx))).await;
+
+            if let Err(err) = Arc::try_unwrap(tx).unwrap().commit().await {
+                tracing::error!("Could not commit transaction: {:?}", err);
+            }
+
+            res
+        }
+        Err(err) => {
+            tracing::error!("Could not start transaction: {:?}", err);
+            return Response::from_errors(vec![ServerError::new("Database error", None)]).into();
+        }
+    };
+
+    if res.is_err() {
+        tracing::warn!("GraphQL request failed: {:?}", res.errors);
+    }
+
+    res.into()
 }
 
 pub async fn graphql_playground() -> HttpResponse {
