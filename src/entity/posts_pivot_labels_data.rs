@@ -11,13 +11,20 @@ pub struct Model {
     pub posts_id: i32,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter)]
-pub enum Relation {}
-
-impl RelationTrait for Relation {
-    fn def(&self) -> RelationDef {
-        panic!("No RelationDef")
-    }
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::posts_data::Entity",
+        from = "Column::PostsId",
+        to = "super::posts_data::Column::Id"
+    )]
+    Posts,
+    #[sea_orm(
+        belongs_to = "super::posts_labels::Entity",
+        from = "Column::LabelsId",
+        to = "super::posts_labels::Column::Id"
+    )]
+    Labels,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

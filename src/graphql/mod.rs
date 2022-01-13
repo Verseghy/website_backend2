@@ -2,10 +2,20 @@ mod resolvers;
 mod types;
 
 use async_graphql::{extensions::ApolloTracing, EmptyMutation, EmptySubscription, MergedObject};
-use resolvers::{CanteenQuery, ColleaguesQuery, EventsQuery, PagesQuery};
+use resolvers::{
+    AuthorsQuery, CanteenQuery, ColleaguesQuery, EventsQuery, LabelQuery, PagesQuery, PostsQuery,
+};
 
 #[derive(MergedObject, Default)]
-pub struct Query(CanteenQuery, ColleaguesQuery, EventsQuery, PagesQuery);
+pub struct Query(
+    CanteenQuery,
+    ColleaguesQuery,
+    EventsQuery,
+    PagesQuery,
+    AuthorsQuery,
+    PostsQuery,
+    LabelQuery,
+);
 
 pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>;
 
