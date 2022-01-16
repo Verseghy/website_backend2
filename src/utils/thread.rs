@@ -1,5 +1,5 @@
-use std::io::{Error, ErrorKind, Result};
-use tokio::fs::read_to_string;
+use std::io::{Result};
+
 
 pub async fn num_threads() -> Result<u64> {
     count().await
