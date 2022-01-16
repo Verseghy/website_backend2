@@ -17,9 +17,9 @@ use async_graphql::{
 use sea_orm::{
     prelude::*,
     query::{JoinType, Order, QueryOrder, QuerySelect},
-    DatabaseTransaction, FromQueryResult,
+    Condition, DatabaseTransaction, FromQueryResult,
 };
-use std::{ops::Deref, sync::Arc};
+use std::{future::Future, ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
@@ -81,25 +81,19 @@ enum QueryMinMax {
 }
 
 async fn get_published_posts_min_max_id(db: &DatabaseTransaction) -> Result<(u32, u32)> {
-    let min = PostsData::find()
-        .select_only()
-        .column(posts_data::Column::Id)
-        .filter(posts_data::Column::Published.eq(true))
-        .order_by(posts_data::Column::Id, Order::Asc)
-        .into_values::<(u32,), QueryMinMax>()
-        .one(db)
-        .await
-        .map_err(|err| Error::new(format!("database error: {:?}", err)))?;
-
-    let max = PostsData::find()
-        .select_only()
-        .column(posts_data::Column::Id)
-        .filter(posts_data::Column::Published.eq(true))
-        .order_by(posts_data::Column::Id, Order::Desc)
-        .into_values::<(u32,), QueryMinMax>()
-        .one(db)
-        .await
-        .map_err(|err| Error::new(format!("database error: {:?}", err)))?;
+    let order_by = |order: Order| async move {
+        PostsData::find()
+            .select_only()
+            .column(posts_data::Column::Id)
+            .filter(posts_data::Column::Published.eq(true))
+            .order_by(posts_data::Column::Id, order)
+            .into_values::<(u32,), QueryMinMax>()
+            .one(db)
+            .await
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+    };
+    let min = order_by(Order::Asc).await?;
+    let max = order_by(Order::Desc).await?;
 
     let ((min,), (max,)) = (min.unwrap_or((0,)), max.unwrap_or((0,)));
 
@@ -108,6 +102,39 @@ async fn get_published_posts_min_max_id(db: &DatabaseTransaction) -> Result<(u32
 
 #[derive(Default)]
 pub struct PostsQuery;
+
+fn build_paginated_posts(
+    after: Option<i64>,
+    before: Option<i64>,
+    first: Option<usize>,
+    last: Option<usize>,
+) -> Select<PostsData> {
+    let mut query = PostsData::find()
+        .select_only()
+        .column(posts_data::Column::Id);
+
+    if let Some(before) = before {
+        query = query.filter(posts_data::Column::Id.lt(before));
+    }
+
+    if let Some(after) = after {
+        query = query.filter(posts_data::Column::Id.gt(after));
+    }
+
+    if let Some(first) = first {
+        query = query
+            .limit(first as u64)
+            .order_by(posts_data::Column::Id, Order::Asc);
+    }
+
+    if let Some(last) = last {
+        query = query
+            .limit(last as u64)
+            .order_by(posts_data::Column::Id, Order::Desc);
+    }
+
+    query
+}
 
 #[Object]
 impl PostsQuery {
@@ -127,36 +154,68 @@ impl PostsQuery {
             last,
             |after, before, first, last| async move {
                 let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
-                let mut query = PostsData::find()
-                    .select_only()
-                    .column(posts_data::Column::Id);
+                let mut query = build_paginated_posts(after, before, first, last);
 
                 select_columns_connection!(ctx, query, posts_data::Column);
                 select_columns_connection!(ctx, query, "author" => posts_data::Column::AuthorId);
 
-                if let Some(before) = before {
-                    query = query.filter(posts_data::Column::Id.lt(before));
-                }
-
-                if let Some(after) = after {
-                    query = query.filter(posts_data::Column::Id.gt(after));
-                }
-
-                if let Some(first) = first {
-                    query = query
-                        .limit(first as u64)
-                        .order_by(posts_data::Column::Id, Order::Asc);
-                }
-
-                if let Some(last) = last {
-                    query = query
-                        .limit(last as u64)
-                        .order_by(posts_data::Column::Id, Order::Desc);
-                }
-
                 if featured {
                     query = query.filter(posts_data::Column::Featured.eq(true));
                 }
+
+                let mut res = query
+                    .into_model::<Post>()
+                    .all(db.deref())
+                    .await
+                    .map_err(|err| Error::new(format!("database error: {:?}", err)))?;
+
+                res.sort_by(|a, b| b.id.cmp(&a.id));
+
+                let (min, max) = get_published_posts_min_max_id(db.deref()).await?;
+
+                let mut connection = Connection::new(
+                    min < res.last().map(|x| x.id.unwrap_or(0)).unwrap_or(0),
+                    max > res.last().map(|x| x.id.unwrap_or(0)).unwrap_or(0),
+                );
+
+                connection.append(
+                    res.into_iter()
+                        .map(|post| Edge::new(post.id.unwrap() as i64, post)),
+                );
+
+                Ok::<_, Error>(connection)
+            },
+        )
+        .await
+    }
+
+    async fn search(
+        &self,
+        ctx: &Context<'_>,
+        term: String,
+        after: Option<String>,
+        before: Option<String>,
+        first: Option<i32>,
+        last: Option<i32>,
+    ) -> Result<Connection<i64, Post, EmptyFields, EmptyFields>> {
+        query(
+            after,
+            before,
+            first,
+            last,
+            |after, before, first, last| async move {
+                let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
+                let mut query = build_paginated_posts(after, before, first, last);
+
+                select_columns_connection!(ctx, query, posts_data::Column);
+                select_columns_connection!(ctx, query, "author" => posts_data::Column::AuthorId);
+
+                query = query.filter(
+                    Condition::any()
+                        .add(posts_data::Column::Content.like(format!("%{}%", term).as_str()))
+                        .add(posts_data::Column::Description.like(format!("%{}%", term).as_str()))
+                        .add(posts_data::Column::Title.like(format!("%{}%", term).as_str())),
+                );
 
                 let mut res = query
                     .into_model::<Post>()
@@ -198,5 +257,82 @@ impl PostsQuery {
             .one(db.deref())
             .await
             .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use sea_orm::QueryTrait;
+
+    #[test]
+    fn test_build_paginated_posts() {
+        struct TestCase<'a> {
+            name: &'a str,
+            after: Option<i64>,
+            before: Option<i64>,
+            first: Option<usize>,
+            last: Option<usize>,
+            expected_query: &'a str,
+        };
+        let tests = vec![
+           TestCase {
+               name: "only first",
+               after: None,
+               before: None,
+               first: Some(10),
+               last: None,
+               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` ORDER BY `posts_data`.`id` ASC LIMIT 10"
+           },
+           TestCase {
+               name: "only last",
+               after: None,
+               before: None,
+               first: None,
+               last: Some(10),
+               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` ORDER BY `posts_data`.`id` DESC LIMIT 10"
+           },
+           TestCase {
+               name: "first with after",
+               after: Some(69),
+               before: None,
+               first: Some(10),
+               last: None,
+               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` > 69 ORDER BY `posts_data`.`id` ASC LIMIT 10"
+           },
+               TestCase {
+               name: "first with before",
+               after: None,
+               before: Some(69),
+               first: Some(10),
+               last: None,
+               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` < 69 ORDER BY `posts_data`.`id` ASC LIMIT 10"
+           },
+           TestCase {
+               name: "last with after",
+               after: Some(69),
+               before: None,
+               first: None,
+               last: Some(10),
+               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` > 69 ORDER BY `posts_data`.`id` DESC LIMIT 10"
+           },
+           TestCase {
+               name: "last with before",
+               after: None,
+               before: Some(69),
+               first: None,
+               last: Some(10),
+               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` < 69 ORDER BY `posts_data`.`id` DESC LIMIT 10"
+           }
+        ];
+        for tc in tests {
+            let res = build_paginated_posts(tc.after, tc.before, tc.first, tc.last);
+            let str = res.build(sea_orm::DatabaseBackend::MySql).to_string();
+            assert_eq!(
+                tc.expected_query, str,
+                "error assertion in test {}",
+                tc.name
+            );
+        }
     }
 }
