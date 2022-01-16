@@ -19,7 +19,7 @@ use sea_orm::{
     query::{JoinType, Order, QueryOrder, QuerySelect},
     Condition, DatabaseTransaction, FromQueryResult,
 };
-use std::{future::Future, ops::Deref, sync::Arc};
+use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
