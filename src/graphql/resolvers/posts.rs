@@ -20,6 +20,7 @@ use sea_orm::{
     Condition, DatabaseTransaction, FromQueryResult,
 };
 use std::{ops::Deref, sync::Arc};
+use chrono::NaiveDate;
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
@@ -257,6 +258,34 @@ impl PostsQuery {
             .one(db.deref())
             .await
             .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+    }
+
+    async fn archive(&self, ctx: &Context<'_>, year: i32, month: u32) -> Result<Vec<Post>> {
+        let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
+        let mut query = PostsData::find().select_only();
+
+        select_columns!(ctx, query, posts_data::Column);
+        select_columns!(ctx, query, "author" => posts_data::Column::AuthorId);
+
+        let start = NaiveDate::from_ymd_opt(year, month, 1)
+            .ok_or_else(|| Error::new("invalid date"))?
+            .and_hms(0, 0, 0);
+
+        let end = if month < 12 {
+            NaiveDate::from_ymd_opt(year, month + 1, 1).ok_or_else(|| Error::new("invalid date"))?
+        } else {
+            NaiveDate::from_ymd_opt(year + 1, 1, 1).ok_or_else(|| Error::new("invalid date"))?
+        }
+        .and_hms(0, 0, 0);
+
+        Ok(query
+           .filter(posts_data::Column::Date.gte(start))
+           .filter(posts_data::Column::Date.lt(end))
+           .order_by(posts_data::Column::Date, Order::Desc)
+           .into_model::<Post>()
+           .all(db.deref())
+           .await
+           .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
     }
 }
 
