@@ -6,8 +6,8 @@ pub async fn num_threads() -> Result<u64> {
 
 #[cfg(any(target_os = "linux", target_os = "freebsd"))]
 async fn count() -> Result<u64> {
-    use tokio::fs::read_to_string;
     use std::io::{Error, ErrorKind};
+    use tokio::fs::read_to_string;
 
     let stat = read_to_string("/proc/self/stat").await?;
     stat.split(' ')

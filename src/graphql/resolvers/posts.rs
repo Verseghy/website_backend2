@@ -274,7 +274,8 @@ mod test {
             first: Option<usize>,
             last: Option<usize>,
             expected_query: &'a str,
-        };
+        }
+
         let tests = vec![
            TestCase {
                name: "only first",
