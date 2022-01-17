@@ -290,79 +290,49 @@ impl PostsQuery {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use sea_orm::QueryTrait;
+    use test_case::test_case;
 
-    #[test]
-    fn test_build_paginated_posts() {
-        struct TestCase<'a> {
-            name: &'a str,
-            after: Option<i64>,
-            before: Option<i64>,
-            first: Option<usize>,
-            last: Option<usize>,
-            expected_query: &'a str,
-        }
-
-        let tests = vec![
-           TestCase {
-               name: "only first",
-               after: None,
-               before: None,
-               first: Some(10),
-               last: None,
-               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` ORDER BY `posts_data`.`id` ASC LIMIT 10"
-           },
-           TestCase {
-               name: "only last",
-               after: None,
-               before: None,
-               first: None,
-               last: Some(10),
-               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` ORDER BY `posts_data`.`id` DESC LIMIT 10"
-           },
-           TestCase {
-               name: "first with after",
-               after: Some(69),
-               before: None,
-               first: Some(10),
-               last: None,
-               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` > 69 ORDER BY `posts_data`.`id` ASC LIMIT 10"
-           },
-               TestCase {
-               name: "first with before",
-               after: None,
-               before: Some(69),
-               first: Some(10),
-               last: None,
-               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` < 69 ORDER BY `posts_data`.`id` ASC LIMIT 10"
-           },
-           TestCase {
-               name: "last with after",
-               after: Some(69),
-               before: None,
-               first: None,
-               last: Some(10),
-               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` > 69 ORDER BY `posts_data`.`id` DESC LIMIT 10"
-           },
-           TestCase {
-               name: "last with before",
-               after: None,
-               before: Some(69),
-               first: None,
-               last: Some(10),
-               expected_query: "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` < 69 ORDER BY `posts_data`.`id` DESC LIMIT 10"
-           }
-        ];
-        for tc in tests {
-            let res = build_paginated_posts(tc.after, tc.before, tc.first, tc.last);
-            let str = res.build(sea_orm::DatabaseBackend::MySql).to_string();
-            assert_eq!(
-                tc.expected_query, str,
-                "error assertion in test {}",
-                tc.name
-            );
-        }
+    #[test_case(
+        None, None, Some(10), None
+        => "SELECT `posts_data`.`id` FROM `posts_data` ORDER BY `posts_data`.`id` ASC LIMIT 10";
+        "only first"
+    )]
+    #[test_case(
+        None, None, None, Some(10)
+        => "SELECT `posts_data`.`id` FROM `posts_data` ORDER BY `posts_data`.`id` DESC LIMIT 10";
+        "only last"
+    )]
+    #[test_case(
+        Some(69), None, Some(10), None
+        => "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` > 69 ORDER BY `posts_data`.`id` ASC LIMIT 10";
+        "first with after"
+    )]
+    #[test_case(
+        None, Some(69), Some(10), None
+        => "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` < 69 ORDER BY `posts_data`.`id` ASC LIMIT 10";
+        "first with before"
+    )]
+    #[test_case(
+        Some(69), None, None, Some(10)
+        => "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` > 69 ORDER BY `posts_data`.`id` DESC LIMIT 10";
+        "last with after"
+    )]
+    #[test_case(
+        None, Some(69), None, Some(10)
+        => "SELECT `posts_data`.`id` FROM `posts_data` WHERE `posts_data`.`id` < 69 ORDER BY `posts_data`.`id` DESC LIMIT 10";
+        "last with before"
+    )]
+    fn test_build_paginated_posts(
+        after: Option<i64>,
+        before: Option<i64>,
+        first: Option<usize>,
+        last: Option<usize>,
+    ) -> String {
+        build_paginated_posts(after, before, first, last)
+            .build(sea_orm::DatabaseBackend::MySql)
+            .to_string()
     }
 }
