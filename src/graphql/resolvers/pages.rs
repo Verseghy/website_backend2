@@ -26,11 +26,11 @@ impl PagesQuery {
 
         select_columns!(ctx, query, Column);
 
-        Ok(query
+        query
             .filter(Column::Slug.eq(slug))
             .into_model::<Page>()
             .one(db.deref())
             .await
-            .map_err(|_| Error::new("database error"))?)
+            .map_err(|_| Error::new("database error"))
     }
 }

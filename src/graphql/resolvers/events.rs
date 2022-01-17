@@ -45,13 +45,13 @@ impl EventsQuery {
         }
         .and_hms(0, 0, 0);
 
-        Ok(query
+        query
             .filter(Column::DateTo.gte(start))
             .filter(Column::DateTo.lt(end))
             .order_by(Column::DateFrom, Order::Asc)
             .into_model::<Event>()
             .all(db.deref())
             .await
-            .map_err(|_| Error::new("database error"))?)
+            .map_err(|_| Error::new("database error"))
     }
 }

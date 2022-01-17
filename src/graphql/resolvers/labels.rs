@@ -33,7 +33,7 @@ impl Label {
         select_columns!(ctx, query, posts_data::Column);
         select_columns!(ctx, query, "labels" => posts_data::Column::Id);
 
-        Ok(query
+        query
             .filter(posts_pivot_labels_data::Column::LabelsId.eq(self.id.deref().unwrap()))
             .join_rev(
                 JoinType::Join,
@@ -43,7 +43,7 @@ impl Label {
             .into_model::<Post>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }
 
@@ -59,11 +59,11 @@ impl LabelQuery {
         select_columns!(ctx, query, posts_labels::Column);
         select_columns!(ctx, query, "posts" => posts_labels::Column::Id);
 
-        Ok(query
+        query
             .filter(posts_labels::Column::Id.eq(id))
             .into_model::<Label>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }

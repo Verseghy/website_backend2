@@ -33,13 +33,13 @@ impl Author {
         select_columns!(ctx, query, posts_data::Column);
         select_columns!(ctx, query, "author" => posts_data::Column::AuthorId);
 
-        Ok(query
+        query
             .filter(posts_data::Column::AuthorId.eq(self.id.unwrap()))
             .order_by(posts_data::Column::Id, Order::Desc)
             .into_model::<Post>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }
 
@@ -55,11 +55,11 @@ impl AuthorsQuery {
         select_columns!(ctx, query, posts_authors::Column);
         select_columns!(ctx, query, "posts" => posts_authors::Column::Id);
 
-        Ok(query
+        query
             .filter(posts_authors::Column::Id.eq(id))
             .into_model::<Author>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }

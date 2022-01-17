@@ -14,13 +14,13 @@ use async_graphql::{
     connection::{query, Connection, Edge, EmptyFields},
     ComplexObject, Context, Error, Object, Result, SimpleObject,
 };
+use chrono::NaiveDate;
 use sea_orm::{
     prelude::*,
     query::{JoinType, Order, QueryOrder, QuerySelect},
     Condition, DatabaseTransaction, FromQueryResult,
 };
 use std::{ops::Deref, sync::Arc};
-use chrono::NaiveDate;
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
@@ -62,7 +62,7 @@ impl Post {
         select_columns!(ctx, query, posts_labels::Column);
         select_columns!(ctx, query, "labels" => posts_labels::Column::Id);
 
-        Ok(query
+        query
             .filter(posts_pivot_labels_data::Column::PostsId.eq(self.id.deref().unwrap()))
             .join_rev(
                 JoinType::Join,
@@ -72,7 +72,7 @@ impl Post {
             .into_model::<Label>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }
 
@@ -251,13 +251,13 @@ impl PostsQuery {
         select_columns!(ctx, query, posts_data::Column);
         select_columns!(ctx, query, "author" => posts_data::Column::AuthorId);
 
-        Ok(query
+        query
             .filter(posts_data::Column::Id.eq(id))
             .order_by(posts_data::Column::Id, Order::Desc)
             .into_model::<Post>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 
     async fn archive(&self, ctx: &Context<'_>, year: i32, month: u32) -> Result<Vec<Post>> {
@@ -278,14 +278,14 @@ impl PostsQuery {
         }
         .and_hms(0, 0, 0);
 
-        Ok(query
-           .filter(posts_data::Column::Date.gte(start))
-           .filter(posts_data::Column::Date.lt(end))
-           .order_by(posts_data::Column::Date, Order::Desc)
-           .into_model::<Post>()
-           .all(db.deref())
-           .await
-           .map_err(|err| Error::new(format!("database error: {:?}", err)))?)
+        query
+            .filter(posts_data::Column::Date.gte(start))
+            .filter(posts_data::Column::Date.lt(end))
+            .order_by(posts_data::Column::Date, Order::Desc)
+            .into_model::<Post>()
+            .all(db.deref())
+            .await
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }
 

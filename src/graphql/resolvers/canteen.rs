@@ -49,7 +49,7 @@ impl Canteen {
 
         select_columns!(ctx, query, canteen_menus::Column);
 
-        Ok(query
+        query
             .filter(canteen_pivot_menus_data::Column::DataId.eq(self.id.deref().unwrap()))
             .join_rev(
                 JoinType::Join,
@@ -59,7 +59,7 @@ impl Canteen {
             .into_model::<Menu>()
             .all(db.deref())
             .await
-            .map_err(|_| Error::new("database error"))?)
+            .map_err(|_| Error::new("database error"))
     }
 }
 
@@ -78,13 +78,13 @@ impl CanteenQuery {
         let start = NaiveDate::from_isoywd_opt(year, week as u32, Weekday::Mon).unwrap();
         let end = NaiveDate::from_isoywd_opt(year, week as u32, Weekday::Sun).unwrap();
 
-        Ok(query
+        query
             .filter(canteen_data::Column::Date.lte(end))
             .filter(canteen_data::Column::Date.gte(start))
             .order_by(canteen_data::Column::Date, Order::Asc)
             .into_model::<Canteen>()
             .all(db.deref())
             .await
-            .map_err(|_| Error::new("database error"))?)
+            .map_err(|_| Error::new("database error"))
     }
 }
