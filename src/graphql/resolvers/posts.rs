@@ -33,12 +33,25 @@ pub struct Post {
     pub index_image: Maybe<String>,
     #[graphql(skip)]
     pub author_id: Maybe<u32>,
+    #[graphql(skip)]
     pub images: Maybe<Json>,
     pub date: Maybe<DateTime>,
 }
 
 #[ComplexObject]
 impl Post {
+    async fn images(&self) -> Result<Vec<&str>> {
+        if let Some(Json::Array(ref arr)) = &*self.images {
+            Ok(arr
+                .iter()
+                .filter(|elem| elem.is_string())
+                .map(|elem| elem.as_str().unwrap())
+                .collect())
+        } else {
+            Err(Error::new("invalid data in database"))
+        }
+    }
+
     async fn author(&self, ctx: &Context<'_>) -> Result<Author> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsAuthors::find().select_only();
