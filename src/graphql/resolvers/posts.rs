@@ -28,7 +28,7 @@ pub struct Post {
     pub id: Maybe<u32>,
     pub title: Maybe<String>,
     pub color: Maybe<String>,
-    pub description: Maybe<String>,
+    pub description: Maybe<Option<String>>,
     pub content: Maybe<String>,
     pub index_image: Maybe<String>,
     #[graphql(skip)]

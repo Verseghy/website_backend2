@@ -20,8 +20,8 @@ use std::{ops::Deref, sync::Arc};
 pub struct Author {
     pub id: Maybe<u32>,
     pub name: Maybe<String>,
-    pub description: Maybe<String>,
-    pub image: Maybe<String>,
+    pub description: Maybe<Option<String>>,
+    pub image: Maybe<Option<String>>,
 }
 
 #[ComplexObject]

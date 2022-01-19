@@ -31,3 +31,9 @@ impl TryGetable for DateTime {
         Ok(DateTime(NaiveDateTime::try_get(res, pre, col)?))
     }
 }
+
+impl Default for DateTime {
+    fn default() -> Self {
+        DateTime(NaiveDateTime::from_timestamp(0, 0))
+    }
+}

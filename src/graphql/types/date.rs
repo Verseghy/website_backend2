@@ -31,3 +31,9 @@ impl TryGetable for Date {
         Ok(Date(NaiveDate::try_get(res, pre, col)?))
     }
 }
+
+impl Default for Date {
+    fn default() -> Self {
+        Date(NaiveDate::from_ymd(1970, 1, 1))
+    }
+}

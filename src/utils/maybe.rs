@@ -6,9 +6,9 @@ use sea_orm::{QueryResult, TryGetError, TryGetable};
 use std::{borrow::Cow, ops::Deref};
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Debug, Hash)]
-pub struct Maybe<T>(pub Option<T>);
+pub struct Maybe<T: Default>(pub Option<T>);
 
-impl<T> Deref for Maybe<T> {
+impl<T: Default> Deref for Maybe<T> {
     type Target = Option<T>;
 
     fn deref(&self) -> &Self::Target {
@@ -16,28 +16,29 @@ impl<T> Deref for Maybe<T> {
     }
 }
 
-impl<T: TryGetable> TryGetable for Maybe<T> {
+impl<T: TryGetable + Default> TryGetable for Maybe<T> {
     fn try_get(res: &QueryResult, pre: &str, col: &str) -> Result<Self, TryGetError> {
         match T::try_get(res, pre, col) {
             Ok(value) => Ok(Maybe(Some(value))),
+            Err(TryGetError::Null) => Ok(Maybe(Some(T::default()))),
             Err(_) => Ok(Maybe(None)),
         }
     }
 }
 
 #[async_trait]
-impl<T: OutputType + Sync> OutputType for Maybe<T> {
+impl<T: OutputType + Sync + Default> OutputType for Maybe<T> {
     fn type_name() -> Cow<'static, str> {
         T::type_name()
     }
 
     fn qualified_type_name() -> String {
-        T::type_name().to_string()
+        T::qualified_type_name().to_string()
     }
 
     fn create_type_info(registry: &mut Registry) -> String {
         T::create_type_info(registry);
-        T::type_name().to_string()
+        T::qualified_type_name().to_string()
     }
 
     async fn resolve(

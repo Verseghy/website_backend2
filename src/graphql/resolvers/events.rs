@@ -19,8 +19,8 @@ pub struct Event {
     date_from: Maybe<DateTime>,
     date_to: Maybe<DateTime>,
     title: Maybe<String>,
-    description: Maybe<String>,
-    color: Maybe<String>,
+    description: Maybe<Option<String>>,
+    color: Maybe<Option<String>>,
 }
 
 #[derive(Default)]

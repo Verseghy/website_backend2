@@ -11,11 +11,11 @@ use std::{ops::Deref, sync::Arc};
 pub struct Colleague {
     pub id: Maybe<u32>,
     pub name: Maybe<String>,
-    pub jobs: Maybe<String>,
-    pub subjects: Maybe<String>,
-    pub roles: Maybe<String>,
-    pub awards: Maybe<String>,
-    pub image: Maybe<String>,
+    pub jobs: Maybe<Option<String>>,
+    pub subjects: Maybe<Option<String>>,
+    pub roles: Maybe<Option<String>>,
+    pub awards: Maybe<Option<String>>,
+    pub image: Maybe<Option<String>>,
     pub category: Maybe<u16>,
 }
 
