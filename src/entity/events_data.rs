@@ -12,8 +12,8 @@ pub struct Model {
     pub title: String,
     pub description: Option<String>,
     pub color: Option<String>,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
+    pub created_at: DateTime,
+    pub updated_at: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter)]

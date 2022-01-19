@@ -8,15 +8,15 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub name: String,
-    pub r#type: Option<String>,
+    pub r#type: String,
     pub link: Option<String>,
     pub page_id: Option<i32>,
     pub parent_id: Option<i32>,
-    pub lft: Option<i32>,
-    pub rgt: Option<i32>,
-    pub depth: Option<i32>,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
+    pub lft: i32,
+    pub rgt: i32,
+    pub depth: i32,
+    pub created_at: DateTime,
+    pub updated_at: DateTime,
     pub deleted_at: Option<DateTime>,
 }
 
