@@ -33,12 +33,12 @@ impl<T: OutputType + Sync + Default> OutputType for Maybe<T> {
     }
 
     fn qualified_type_name() -> String {
-        T::qualified_type_name().to_string()
+        T::qualified_type_name()
     }
 
     fn create_type_info(registry: &mut Registry) -> String {
         T::create_type_info(registry);
-        T::qualified_type_name().to_string()
+        T::qualified_type_name()
     }
 
     async fn resolve(
