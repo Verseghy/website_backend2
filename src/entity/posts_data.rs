@@ -21,6 +21,7 @@ pub struct Model {
     pub updated_at: DateTime,
     pub featured: i8,
     pub published: i8,
+    #[sea_orm(column_name = "previewToken")]
     pub preview_token: Option<String>,
 }
 

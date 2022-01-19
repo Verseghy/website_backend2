@@ -287,6 +287,23 @@ impl PostsQuery {
             .await
             .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
+
+    async fn preview(&self, ctx: &Context<'_>, id: u32, token: String) -> Result<Option<Post>> {
+        let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
+        let mut query = PostsData::find().select_only();
+
+        select_columns!(ctx, query, posts_data::Column);
+        select_columns!(ctx, query, "author" => posts_data::Column::AuthorId);
+
+        query
+            .filter(posts_data::Column::Id.eq(id))
+            .filter(posts_data::Column::Published.eq(false))
+            .filter(posts_data::Column::PreviewToken.eq(token))
+            .into_model::<Post>()
+            .one(db.deref())
+            .await
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+    }
 }
 
 #[cfg(test)]
