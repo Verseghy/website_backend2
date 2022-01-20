@@ -3,11 +3,12 @@ use crate::{
     select_columns,
     utils::Maybe,
 };
-use async_graphql::{Context, Error, Object, Result, SimpleObject};
+use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
 use sea_orm::{prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
+#[graphql(complex)]
 pub struct Colleague {
     pub id: Maybe<u32>,
     pub name: Maybe<String>,
@@ -15,8 +16,23 @@ pub struct Colleague {
     pub subjects: Maybe<Option<String>>,
     pub roles: Maybe<Option<String>>,
     pub awards: Maybe<Option<String>>,
+    #[graphql(skip)]
     pub image: Maybe<Option<String>>,
     pub category: Maybe<u16>,
+}
+
+#[ComplexObject]
+impl Colleague {
+    async fn image(&self) -> Result<Option<String>> {
+        if let Some(Some(ref image)) = *self.image {
+            Ok(Some(format!(
+                "https://backend.verseghy-gimnazium.net/storage/colleagues_images/{}",
+                image
+            )))
+        } else {
+            Ok(None)
+        }
+    }
 }
 
 #[derive(Default)]
