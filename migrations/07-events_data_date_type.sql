@@ -1,0 +1,5 @@
+ALTER TABLE `events_data`
+	MODIFY COLUMN `color`      VARCHAR(7) NOT NULL,
+	MODIFY COLUMN `created_at` DATETIME   NOT NULL,
+	MODIFY COLUMN `updated_at` DATETIME   NOT NULL;
+
