@@ -73,7 +73,7 @@ impl Post {
         let mut query = PostsLabels::find().select_only();
 
         select_columns!(ctx, query, posts_labels::Column);
-        select_columns!(ctx, query, "labels" => posts_labels::Column::Id);
+        select_columns!(ctx, query, "posts" => posts_labels::Column::Id);
 
         query
             .filter(posts_pivot_labels_data::Column::PostsId.eq(self.id.deref().unwrap()))
@@ -171,7 +171,9 @@ impl PostsQuery {
                 let mut query = build_paginated_posts(after, before, first, last);
 
                 select_columns_connection!(ctx, query, posts_data::Column);
-                select_columns_connection!(ctx, query, "author" => posts_data::Column::AuthorId);
+                select_columns_connection!(ctx, query,
+                    "author" => posts_data::Column::AuthorId,
+                    "labels" => posts_data::Column::Id);
 
                 if featured {
                     query = query.filter(posts_data::Column::Featured.eq(true));
@@ -222,7 +224,6 @@ impl PostsQuery {
                 let mut query = build_paginated_posts(after, before, first, last);
 
                 select_columns_connection!(ctx, query, posts_data::Column);
-                select_columns_connection!(ctx, query, "author" => posts_data::Column::AuthorId);
 
                 query = query.filter(
                     Condition::any()
@@ -230,6 +231,9 @@ impl PostsQuery {
                         .add(posts_data::Column::Description.like(format!("%{}%", term).as_str()))
                         .add(posts_data::Column::Title.like(format!("%{}%", term).as_str())),
                 );
+                select_columns_connection!(ctx, query,
+                    "author" => posts_data::Column::AuthorId,
+                    "labels" => posts_data::Column::Id);
 
                 let mut res = query
                     .into_model::<Post>()
@@ -278,7 +282,9 @@ impl PostsQuery {
         let mut query = PostsData::find().select_only();
 
         select_columns!(ctx, query, posts_data::Column);
-        select_columns!(ctx, query, "author" => posts_data::Column::AuthorId);
+        select_columns!(ctx, query,
+            "author" => posts_data::Column::AuthorId,
+            "labels" => posts_data::Column::Id);
 
         let start = NaiveDate::from_ymd_opt(year, month, 1)
             .ok_or_else(|| Error::new("invalid date"))?

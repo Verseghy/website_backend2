@@ -31,7 +31,9 @@ impl Label {
         let mut query = PostsData::find().select_only();
 
         select_columns!(ctx, query, posts_data::Column);
-        select_columns!(ctx, query, "labels" => posts_data::Column::Id);
+        select_columns!(ctx, query,
+            "author" => posts_data::Column::AuthorId,
+            "labels" => posts_data::Column::Id);
 
         query
             .filter(posts_pivot_labels_data::Column::LabelsId.eq(self.id.deref().unwrap()))

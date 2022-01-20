@@ -31,7 +31,9 @@ impl Author {
         let mut query = PostsData::find().select_only();
 
         select_columns!(ctx, query, posts_data::Column);
-        select_columns!(ctx, query, "author" => posts_data::Column::AuthorId);
+        select_columns!(ctx, query,
+            "author" => posts_data::Column::AuthorId,
+            "labels" => posts_data::Column::Id);
 
         query
             .filter(posts_data::Column::AuthorId.eq(self.id.unwrap()))
