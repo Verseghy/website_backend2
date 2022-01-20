@@ -236,17 +236,20 @@ impl PostsQuery {
 
                 select_columns_connection!(ctx, query, posts_data::Column);
 
-                query = query.filter(
-                    Condition::any()
-                        .add(posts_data::Column::Content.like(format!("%{}%", term).as_str()))
-                        .add(posts_data::Column::Description.like(format!("%{}%", term).as_str()))
-                        .add(posts_data::Column::Title.like(format!("%{}%", term).as_str())),
-                );
                 select_columns_connection!(ctx, query,
                     "author" => posts_data::Column::AuthorId,
                     "labels" => posts_data::Column::Id);
 
                 let mut res = query
+                    .filter(
+                        Condition::any()
+                            .add(posts_data::Column::Content.like(format!("%{}%", term).as_str()))
+                            .add(
+                                posts_data::Column::Description
+                                    .like(format!("%{}%", term).as_str()),
+                            )
+                            .add(posts_data::Column::Title.like(format!("%{}%", term).as_str())),
+                    )
                     .into_model::<Post>()
                     .all(db.deref())
                     .await
