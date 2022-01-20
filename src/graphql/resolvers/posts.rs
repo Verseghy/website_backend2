@@ -30,6 +30,7 @@ pub struct Post {
     pub color: Maybe<String>,
     pub description: Maybe<Option<String>>,
     pub content: Maybe<String>,
+    #[graphql(skip)]
     pub index_image: Maybe<String>,
     #[graphql(skip)]
     pub author_id: Maybe<u32>,
@@ -40,6 +41,17 @@ pub struct Post {
 
 #[ComplexObject]
 impl Post {
+    async fn index_image(&self) -> Result<String> {
+        if let Some(ref image) = *self.index_image {
+            Ok(format!(
+                "https://backend.verseghy-gimnazium.net/storage/posts_images/{}",
+                image
+            ))
+        } else {
+            Err(Error::new("No index image found"))
+        }
+    }
+
     async fn images(&self) -> Result<Vec<&str>> {
         if let Some(Json::Array(ref arr)) = &*self.images {
             Ok(arr
