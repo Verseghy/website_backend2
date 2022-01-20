@@ -6,7 +6,7 @@ use crate::{
         posts_labels::{self, Entity as PostsLabels},
         posts_pivot_labels_data,
     },
-    graphql::types::DateTime,
+    graphql::types::Date,
     select_columns, select_columns_connection,
     utils::Maybe,
 };
@@ -35,7 +35,7 @@ pub struct Post {
     pub author_id: Maybe<u32>,
     #[graphql(skip)]
     pub images: Maybe<Json>,
-    pub date: Maybe<DateTime>,
+    pub date: Maybe<Date>,
 }
 
 #[ComplexObject]
