@@ -31,6 +31,6 @@ impl PagesQuery {
             .into_model::<Page>()
             .one(db.deref())
             .await
-            .map_err(|_| Error::new("database error"))
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }

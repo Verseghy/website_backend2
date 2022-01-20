@@ -59,7 +59,7 @@ impl Canteen {
             .into_model::<Menu>()
             .all(db.deref())
             .await
-            .map_err(|_| Error::new("database error"))
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }
 
@@ -85,6 +85,6 @@ impl CanteenQuery {
             .into_model::<Canteen>()
             .all(db.deref())
             .await
-            .map_err(|_| Error::new("database error"))
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 }

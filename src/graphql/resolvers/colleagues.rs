@@ -50,7 +50,7 @@ impl ColleaguesQuery {
             .into_model::<Colleague>()
             .all(db.deref())
             .await
-            .map_err(|_| Error::new("database error"))?;
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))?;
 
         if ctx.look_ahead().field("name").exists() {
             res.sort_by(|a, b| {

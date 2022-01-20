@@ -32,7 +32,8 @@ pub async fn graphql(
         }
         Err(err) => {
             tracing::error!("Could not start transaction: {:?}", err);
-            return Response::from_errors(vec![ServerError::new("Database error", None)]).into();
+            return Response::from_errors(vec![ServerError::new("Transaction begin failed", None)])
+                .into();
         }
     };
 
@@ -57,7 +58,6 @@ pub async fn readiness() -> HttpResponse {
 
 pub async fn liveness() -> HttpResponse {
     if let Ok(threads) = num_threads().await {
-        tracing::debug!("Liveness thread count: {}", threads);
         if threads < 10000 {
             return HttpResponse::new(StatusCode::OK);
         }
