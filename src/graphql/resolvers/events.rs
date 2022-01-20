@@ -5,7 +5,7 @@ use crate::{
     utils::Maybe,
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
-use chrono::NaiveDate;
+use chrono::{Datelike, Duration, NaiveDate};
 use sea_orm::{
     prelude::*,
     query::{Order, QueryOrder, QuerySelect},
@@ -34,20 +34,29 @@ impl EventsQuery {
 
         select_columns!(ctx, query, Column);
 
-        let start = NaiveDate::from_ymd_opt(year, month, 1)
+        let start = {
+            let start = NaiveDate::from_ymd_opt(year, month, 1)
+                .ok_or_else(|| Error::new("invalid date"))?
+                .and_hms(0, 0, 0);
+
+            start - Duration::days(start.weekday().num_days_from_monday().into())
+        };
+
+        let end = {
+            let end = if month < 12 {
+                NaiveDate::from_ymd_opt(year, month + 1, 1)
+            } else {
+                NaiveDate::from_ymd_opt(year + 1, 1, 1)
+            }
             .ok_or_else(|| Error::new("invalid date"))?
             .and_hms(0, 0, 0);
 
-        let end = if month < 12 {
-            NaiveDate::from_ymd_opt(year, month + 1, 1).ok_or_else(|| Error::new("invalid date"))?
-        } else {
-            NaiveDate::from_ymd_opt(year + 1, 1, 1).ok_or_else(|| Error::new("invalid date"))?
-        }
-        .and_hms(0, 0, 0);
+            end + Duration::days((6 - end.weekday().num_days_from_monday()).into())
+        };
 
         query
             .filter(Column::DateTo.gte(start))
-            .filter(Column::DateTo.lt(end))
+            .filter(Column::DateFrom.lt(end))
             .order_by(Column::DateFrom, Order::Asc)
             .into_model::<Event>()
             .all(db.deref())
