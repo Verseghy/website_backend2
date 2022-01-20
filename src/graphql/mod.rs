@@ -22,9 +22,7 @@ pub struct Query(
 pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>;
 
 pub async fn create_schema() -> Schema {
-    let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
-        .extension(ApolloTracing)
-        .finish();
+    let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription).finish();
 
     tracing::info!("Schema created");
     schema
