@@ -6,6 +6,7 @@ mod utils;
 
 use crate::{graphql::create_schema, http::handlers};
 use actix_web::{
+    middleware,
     web::{self, Data},
     App, HttpServer,
 };
@@ -29,6 +30,7 @@ async fn main() -> io::Result<()> {
     tracing::info!("Listening on port {}", addr.port());
     HttpServer::new(move || {
         App::new()
+            .wrap(middleware::Compress::default())
             .app_data(Data::new(schema.clone()))
             .app_data(Data::new(database.clone()))
             .route(GRAPHQL_PATH, web::post().to(handlers::graphql))
