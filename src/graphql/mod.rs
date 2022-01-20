@@ -1,7 +1,7 @@
 mod resolvers;
 mod types;
 
-use async_graphql::{extensions::ApolloTracing, EmptyMutation, EmptySubscription, MergedObject};
+use async_graphql::{EmptyMutation, EmptySubscription, MergedObject};
 use resolvers::{
     AuthorsQuery, CanteenQuery, ColleaguesQuery, EventsQuery, LabelQuery, MenuQuery, PagesQuery,
     PostsQuery,
