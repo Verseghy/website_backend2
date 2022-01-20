@@ -319,10 +319,11 @@ impl PostsQuery {
             .and_hms(0, 0, 0);
 
         let end = if month < 12 {
-            NaiveDate::from_ymd_opt(year, month + 1, 1).ok_or_else(|| Error::new("invalid date"))?
+            NaiveDate::from_ymd_opt(year, month + 1, 1)
         } else {
-            NaiveDate::from_ymd_opt(year + 1, 1, 1).ok_or_else(|| Error::new("invalid date"))?
+            NaiveDate::from_ymd_opt(year + 1, 1, 1)
         }
+        .ok_or_else(|| Error::new("invalid date"))?
         .and_hms(0, 0, 0);
 
         query
