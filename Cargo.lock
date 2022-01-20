@@ -325,6 +325,7 @@ dependencies = [
  "futures-util",
  "http",
  "indexmap",
+ "lru",
  "mime",
  "multer",
  "num-traits",
@@ -333,6 +334,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "sha2",
  "static_assertions",
  "tempfile",
  "thiserror",
@@ -1241,6 +1243,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51b9bbe6c47d51fc3e1a9b945965946b4c44142ab8792c50835a980d362c2710"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "lru"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "274353858935c992b13c0ca408752e2121da852d07dec7ce5f108c77dfa14d1f"
+dependencies = [
+ "hashbrown",
 ]
 
 [[package]]

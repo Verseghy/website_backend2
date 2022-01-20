@@ -1,7 +1,10 @@
 mod resolvers;
 mod types;
 
-use async_graphql::{EmptyMutation, EmptySubscription, MergedObject};
+use async_graphql::{
+    extensions::apollo_persisted_queries::{ApolloPersistedQueries, LruCacheStorage},
+    EmptyMutation, EmptySubscription, MergedObject,
+};
 use resolvers::{
     AuthorsQuery, CanteenQuery, ColleaguesQuery, EventsQuery, LabelQuery, MenuQuery, PagesQuery,
     PostsQuery,
@@ -22,7 +25,9 @@ pub struct Query(
 pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>;
 
 pub async fn create_schema() -> Schema {
-    let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription).finish();
+    let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
+        .extension(ApolloPersistedQueries::new(LruCacheStorage::new(64)))
+        .finish();
 
     tracing::info!("Schema created");
     schema
