@@ -21,11 +21,27 @@ pub struct Author {
     pub id: Maybe<u32>,
     pub name: Maybe<String>,
     pub description: Maybe<Option<String>>,
+    #[graphql(skip)]
     pub image: Maybe<Option<String>>,
 }
 
 #[ComplexObject]
 impl Author {
+    async fn image(&self) -> Result<Option<String>> {
+        if let Some(ref image) = *self.image {
+            if let Some(ref image) = image {
+                Ok(Some(format!(
+                    "https://backend.verseghy-gimnazium.net/storage/authors_images/{}",
+                    image
+                )))
+            } else {
+                Ok(None)
+            }
+        } else {
+            Err(Error::new("Database error: image not selected"))
+        }
+    }
+
     async fn posts(&self, ctx: &Context<'_>) -> Result<Vec<Post>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsData::find().select_only();
