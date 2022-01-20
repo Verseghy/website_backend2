@@ -37,6 +37,7 @@ impl Label {
 
         query
             .filter(posts_pivot_labels_data::Column::LabelsId.eq(self.id.deref().unwrap()))
+            .filter(posts_data::Column::Published.eq(true))
             .join_rev(
                 JoinType::Join,
                 posts_pivot_labels_data::Relation::Posts.def(),

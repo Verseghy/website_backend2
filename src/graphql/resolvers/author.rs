@@ -37,6 +37,7 @@ impl Author {
 
         query
             .filter(posts_data::Column::AuthorId.eq(self.id.unwrap()))
+            .filter(posts_data::Column::Published.eq(true))
             .order_by(posts_data::Column::Id, Order::Desc)
             .into_model::<Post>()
             .all(db.deref())

@@ -191,6 +191,7 @@ impl PostsQuery {
                 }
 
                 let mut res = query
+                    .filter(posts_data::Column::Published.eq(true))
                     .into_model::<Post>()
                     .all(db.deref())
                     .await
@@ -235,7 +236,6 @@ impl PostsQuery {
                 let mut query = build_paginated_posts(after, before, first, last);
 
                 select_columns_connection!(ctx, query, posts_data::Column);
-
                 select_columns_connection!(ctx, query,
                     "author" => posts_data::Column::AuthorId,
                     "labels" => posts_data::Column::Id);
@@ -250,6 +250,7 @@ impl PostsQuery {
                             )
                             .add(posts_data::Column::Title.like(format!("%{}%", term).as_str())),
                     )
+                    .filter(posts_data::Column::Published.eq(true))
                     .into_model::<Post>()
                     .all(db.deref())
                     .await
@@ -284,6 +285,7 @@ impl PostsQuery {
 
         query
             .filter(posts_data::Column::Id.eq(id))
+            .filter(posts_data::Column::Published.eq(true))
             .order_by(posts_data::Column::Id, Order::Desc)
             .into_model::<Post>()
             .one(db.deref())
@@ -314,6 +316,7 @@ impl PostsQuery {
         query
             .filter(posts_data::Column::Date.gte(start))
             .filter(posts_data::Column::Date.lt(end))
+            .filter(posts_data::Column::Published.eq(true))
             .order_by(posts_data::Column::Date, Order::Desc)
             .into_model::<Post>()
             .all(db.deref())
