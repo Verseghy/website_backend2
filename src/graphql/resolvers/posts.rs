@@ -64,20 +64,19 @@ impl Post {
         }
     }
 
-    async fn author(&self, ctx: &Context<'_>) -> Result<Author> {
+    async fn author(&self, ctx: &Context<'_>) -> Result<Option<Author>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsAuthors::find().select_only();
 
         select_columns!(ctx, query, posts_authors::Column);
         select_columns!(ctx, query, "posts" => posts_authors::Column::Id);
 
-        Ok(query
+        query
             .filter(posts_authors::Column::Id.eq(self.author_id.unwrap()))
             .into_model::<Author>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?
-            .unwrap())
+            .map_err(|err| Error::new(format!("database error: {:?}", err)))
     }
 
     async fn labels(&self, ctx: &Context<'_>) -> Result<Vec<Label>> {
