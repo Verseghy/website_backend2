@@ -9,7 +9,8 @@ tokio = { version = "1.15.0", features = ["rt", "rt-multi-thread", "macros", "si
 async-graphql = { version = "3.0.19", features = ["chrono", "apollo_persisted_queries"] }
 async-graphql-actix-web = "3.0.20"
 chrono = { version = "0.4.19", default-features=false }
-sea-orm = { version = "0.4.2", features = ["sqlx-mysql", "runtime-actix-rustls", "macros" ], default-features = false }
+sea-orm = { version = "0.5.0", features = ["sqlx-mysql", "runtime-actix-rustls", "macros" ], default-features = false }
+sea-query = { version = "0.20.0", default-features = false, features = ["derive", "backend-mysql"] }
 tracing = "0.1.29"
 tracing-subscriber = { version = "0.3.5", features= ["env-filter"] }
 dotenv = "0.15.0"

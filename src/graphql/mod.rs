@@ -6,8 +6,8 @@ use async_graphql::{
     EmptyMutation, EmptySubscription, MergedObject,
 };
 use resolvers::{
-    AuthorsQuery, CanteenQuery, ColleaguesQuery, EventsQuery, LabelQuery, MenuQuery, PagesQuery,
-    PostsQuery,
+    ArchiveQuery, AuthorsQuery, CanteenQuery, ColleaguesQuery, EventsQuery, LabelQuery, MenuQuery,
+    PagesQuery, PostsQuery,
 };
 
 #[derive(MergedObject, Default)]
@@ -20,6 +20,7 @@ pub struct Query(
     PostsQuery,
     LabelQuery,
     MenuQuery,
+    ArchiveQuery,
 );
 
 pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>;

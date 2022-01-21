@@ -1,3 +1,4 @@
+mod archive;
 mod author;
 mod canteen;
 mod colleagues;
@@ -7,6 +8,7 @@ mod menu;
 mod pages;
 mod posts;
 
+pub use archive::*;
 pub use author::*;
 pub use canteen::*;
 pub use colleagues::*;
