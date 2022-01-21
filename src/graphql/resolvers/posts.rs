@@ -6,7 +6,7 @@ use crate::{
         posts_labels::{self, Entity as PostsLabels},
         posts_pivot_labels_data,
     },
-    graphql::types::Date,
+    graphql::types::{Date, PostCursor},
     select_columns, select_columns_connection,
     utils::Maybe,
 };
@@ -14,7 +14,6 @@ use async_graphql::{
     connection::{query, Connection, Edge, EmptyFields},
     ComplexObject, Context, Error, Object, Result, SimpleObject,
 };
-use chrono::NaiveDate;
 use sea_orm::{
     prelude::*,
     query::{JoinType, Order, QueryOrder, QuerySelect},
@@ -134,32 +133,39 @@ async fn get_published_posts_min_max_id(db: &DatabaseTransaction) -> Result<(u32
 pub struct PostsQuery;
 
 fn build_paginated_posts(
-    after: Option<i64>,
-    before: Option<i64>,
+    after: Option<PostCursor>,
+    before: Option<PostCursor>,
     first: Option<usize>,
     last: Option<usize>,
 ) -> Select<PostsData> {
     let mut query = PostsData::find()
         .select_only()
-        .column(posts_data::Column::Id);
+        .column(posts_data::Column::Id)
+        .column(posts_data::Column::Date);
 
     if let Some(before) = before {
-        query = query.filter(posts_data::Column::Id.lt(before));
+        query = query
+            .filter(posts_data::Column::Date.lte(before.date()))
+            .filter(posts_data::Column::Id.lt(before.id()));
     }
 
     if let Some(after) = after {
-        query = query.filter(posts_data::Column::Id.gt(after));
+        query = query
+            .filter(posts_data::Column::Date.gte(after.date()))
+            .filter(posts_data::Column::Id.gt(after.id()));
     }
 
     if let Some(first) = first {
         query = query
             .limit(first as u64)
+            .order_by(posts_data::Column::Date, Order::Asc)
             .order_by(posts_data::Column::Id, Order::Asc);
     }
 
     if let Some(last) = last {
         query = query
             .limit(last as u64)
+            .order_by(posts_data::Column::Date, Order::Desc)
             .order_by(posts_data::Column::Id, Order::Desc);
     }
 
@@ -176,7 +182,7 @@ impl PostsQuery {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> Result<Connection<i64, Post, EmptyFields, EmptyFields>> {
+    ) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>> {
         query(
             after,
             before,
@@ -202,7 +208,7 @@ impl PostsQuery {
                     .await
                     .map_err(|err| Error::new(format!("database error: {:?}", err)))?;
 
-                res.sort_by(|a, b| b.id.cmp(&a.id));
+                res.sort_by(|a, b| b.date.cmp(&a.date));
 
                 let (min, max) = get_published_posts_min_max_id(db.deref()).await?;
 
@@ -211,10 +217,10 @@ impl PostsQuery {
                     max > res.last().map(|x| x.id.unwrap_or(0)).unwrap_or(0),
                 );
 
-                connection.append(
-                    res.into_iter()
-                        .map(|post| Edge::new(post.id.unwrap() as i64, post)),
-                );
+                connection.append(res.into_iter().map(|post| {
+                    let cursor = PostCursor::new(post.date.unwrap(), post.id.unwrap());
+                    Edge::new(cursor, post)
+                }));
 
                 Ok::<_, Error>(connection)
             },
@@ -230,7 +236,7 @@ impl PostsQuery {
         before: Option<String>,
         first: Option<i32>,
         last: Option<i32>,
-    ) -> Result<Connection<i64, Post, EmptyFields, EmptyFields>> {
+    ) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>> {
         query(
             after,
             before,
@@ -270,10 +276,10 @@ impl PostsQuery {
                     max > res.last().map(|x| x.id.unwrap_or(0)).unwrap_or(0),
                 );
 
-                connection.append(
-                    res.into_iter()
-                        .map(|post| Edge::new(post.id.unwrap() as i64, post)),
-                );
+                connection.append(res.into_iter().map(|post| {
+                    let cursor = PostCursor::new(post.date.unwrap(), post.id.unwrap());
+                    Edge::new(cursor, post)
+                }));
 
                 Ok::<_, Error>(connection)
             },

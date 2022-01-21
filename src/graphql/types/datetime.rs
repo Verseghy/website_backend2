@@ -3,7 +3,7 @@ use chrono::NaiveDateTime;
 use core::str::FromStr;
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct DateTime(pub NaiveDateTime);
 
 #[Scalar]
