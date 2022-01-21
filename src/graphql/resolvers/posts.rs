@@ -52,12 +52,17 @@ impl Post {
         }
     }
 
-    async fn images(&self) -> Result<Vec<&str>> {
+    async fn images(&self) -> Result<Vec<String>> {
         if let Some(Json::Array(ref arr)) = &*self.images {
             Ok(arr
                 .iter()
                 .filter(|elem| elem.is_string())
-                .map(|elem| elem.as_str().unwrap())
+                .map(|elem| {
+                    format!(
+                        "https://backend.verseghy-gimnazium.net/storage/posts_images/{}",
+                        elem.as_str().unwrap()
+                    )
+                })
                 .collect())
         } else {
             Err(Error::new("invalid data in database"))
