@@ -16,6 +16,8 @@ const GRAPHQL_PATH: &str = "/graphql";
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
+    dotenv::dotenv().ok();
+
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()

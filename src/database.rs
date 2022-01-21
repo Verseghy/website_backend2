@@ -1,7 +1,7 @@
-use dotenv::{var, Result};
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use std::env::{var, VarError};
 
-fn get_db_uri() -> Result<String> {
+fn get_db_uri() -> Result<String, VarError> {
     let username = var("DB_USERNAME")?;
     let password = var("DB_PASSWORD")?;
     let host = var("DB_HOST")?;
