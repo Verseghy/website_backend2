@@ -2,17 +2,17 @@ use super::Post;
 use crate::{
     entity::{
         posts_authors::{self, Entity as PostsAuthors},
-        posts_data::{self, Entity as PostsData},
+        posts_data,
     },
+    graphql::types::PostCursor,
     select_columns,
-    utils::Maybe,
+    utils::{create_paginated_posts, Maybe},
 };
-use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
-use sea_orm::{
-    prelude::*,
-    query::{Order, QueryOrder, QuerySelect},
-    DatabaseTransaction, FromQueryResult,
+use async_graphql::{
+    connection::{Connection, EmptyFields},
+    ComplexObject, Context, Error, Object, Result, SimpleObject,
 };
+use sea_orm::{prelude::*, query::QuerySelect, Condition, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
@@ -42,23 +42,29 @@ impl Author {
         }
     }
 
-    async fn posts(&self, ctx: &Context<'_>) -> Result<Vec<Post>> {
+    async fn posts(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(default = false)] featured: bool,
+        after: Option<String>,
+        before: Option<String>,
+        first: Option<i32>,
+        last: Option<i32>,
+    ) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
-        let mut query = PostsData::find().select_only();
+        let condition = {
+            let condition = if featured {
+                Some(posts_data::Column::Featured.eq(true))
+            } else {
+                None
+            };
 
-        select_columns!(ctx, query, posts_data::Column);
-        select_columns!(ctx, query,
-            "author" => posts_data::Column::AuthorId,
-            "labels" => posts_data::Column::Id);
+            Condition::all()
+                .add_option(condition)
+                .add(posts_data::Column::AuthorId.eq(self.id.unwrap()))
+        };
 
-        query
-            .filter(posts_data::Column::AuthorId.eq(self.id.unwrap()))
-            .filter(posts_data::Column::Published.eq(true))
-            .order_by(posts_data::Column::Id, Order::Desc)
-            .into_model::<Post>()
-            .all(db.deref())
-            .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+        create_paginated_posts(after, before, first, last, ctx, db, condition).await
     }
 }
 
