@@ -24,23 +24,31 @@ impl PostCursor {
 }
 
 impl CursorType for PostCursor {
-    type Error = String;
+    type Error = PostCursorError;
     fn decode_cursor(s: &str) -> Result<Self, Self::Error> {
-        let mut iter = s.split('#');
-        if let (Some(date), Some(id)) = (iter.next(), iter.next()) {
+        let split = s.split_once('#');
+
+        if let Some((date, id)) = split {
             Ok(Self {
-                date: Date(
-                    NaiveDate::parse_from_str(date, DATE_FORMAT)
-                        .map_err(|_| "Wrong date format in cursor".to_string())?,
-                ),
-                id: id.parse().map_err(|_| "Could not parse id".to_string())?,
+                date: Date(NaiveDate::parse_from_str(date, DATE_FORMAT)?),
+                id: id.parse()?,
             })
         } else {
-            Err("Wrong post cursor format".to_string())
+            Err(PostCursorError::WrongFormat)
         }
     }
 
     fn encode_cursor(&self) -> String {
         format!("{}#{}", self.date.0.format(DATE_FORMAT), self.id)
     }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum PostCursorError {
+    #[error("Wrong date format in cursor")]
+    WrongDate(#[from] chrono::ParseError),
+    #[error("Wrong cursor format")]
+    WrongFormat,
+    #[error("Invalid id in cursor")]
+    InvalidId(#[from] std::num::ParseIntError),
 }

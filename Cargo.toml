@@ -15,6 +15,7 @@ redis = "0.21.5"
 tracing = "0.1.29"
 tracing-subscriber = { version = "0.3.5", features= ["env-filter"] }
 dotenv = "0.15.0"
+thiserror = "1.0.30"
 
 [dev-dependencies]
 test-case = "1.2.1"

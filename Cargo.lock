@@ -2723,6 +2723,7 @@ dependencies = [
  "sea-orm",
  "sea-query",
  "test-case",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-subscriber",
