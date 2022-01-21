@@ -14,6 +14,7 @@ use async_graphql::{
     connection::{query, Connection, Edge, EmptyFields},
     ComplexObject, Context, Error, Object, Result, SimpleObject,
 };
+use chrono::NaiveDate;
 use sea_orm::{
     prelude::*,
     query::{JoinType, Order, QueryOrder, QuerySelect},
@@ -106,27 +107,54 @@ impl Post {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
 enum QueryMinMax {
+    Date,
     Id,
 }
 
-async fn get_published_posts_min_max_id(db: &DatabaseTransaction) -> Result<(u32, u32)> {
+async fn get_published_posts_min_max_id(
+    db: &DatabaseTransaction,
+) -> Result<((NaiveDate, u32), (NaiveDate, u32))> {
     let order_by = |order: Order| async move {
         PostsData::find()
             .select_only()
+            .column(posts_data::Column::Date)
             .column(posts_data::Column::Id)
             .filter(posts_data::Column::Published.eq(true))
+            .order_by(posts_data::Column::Date, order)
             .order_by(posts_data::Column::Id, order)
-            .into_values::<(u32,), QueryMinMax>()
+            .into_values::<(NaiveDate, u32), QueryMinMax>()
             .one(db)
             .await
             .map_err(|err| Error::new(format!("database error: {:?}", err)))
     };
-    let min = order_by(Order::Asc).await?;
-    let max = order_by(Order::Desc).await?;
-
-    let ((min,), (max,)) = (min.unwrap_or((0,)), max.unwrap_or((0,)));
+    let min = order_by(Order::Asc)
+        .await?
+        .ok_or_else(|| Error::new("Could not get min value"))?;
+    let max = order_by(Order::Desc)
+        .await?
+        .ok_or_else(|| Error::new("Could not get max value"))?;
 
     Ok((min, max))
+}
+
+fn get_connection(
+    vec: &[Post],
+    min: (NaiveDate, u32),
+    max: (NaiveDate, u32),
+) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>> {
+    if vec.is_empty() {
+        Ok(Connection::new(false, false))
+    } else {
+        let first = vec.first().unwrap();
+        let last = vec.last().unwrap();
+
+        let prev = min.0 <= last.date.ok_or_else(|| Error::new("No date found"))?.0
+            && min.1 != last.id.ok_or_else(|| Error::new("No id found"))?;
+        let next = max.0 >= first.date.ok_or_else(|| Error::new("No date found"))?.0
+            && max.1 != first.id.ok_or_else(|| Error::new("No id found"))?;
+
+        Ok(Connection::new(prev, next))
+    }
 }
 
 #[derive(Default)]
@@ -212,10 +240,7 @@ impl PostsQuery {
 
                 let (min, max) = get_published_posts_min_max_id(db.deref()).await?;
 
-                let mut connection = Connection::new(
-                    min < res.last().map(|x| x.id.unwrap_or(0)).unwrap_or(0),
-                    max > res.last().map(|x| x.id.unwrap_or(0)).unwrap_or(0),
-                );
+                let mut connection = get_connection(&res, min, max)?;
 
                 connection.append(res.into_iter().map(|post| {
                     let cursor = PostCursor::new(post.date.unwrap(), post.id.unwrap());
@@ -271,10 +296,7 @@ impl PostsQuery {
 
                 let (min, max) = get_published_posts_min_max_id(db.deref()).await?;
 
-                let mut connection = Connection::new(
-                    min < res.last().map(|x| x.id.unwrap_or(0)).unwrap_or(0),
-                    max > res.last().map(|x| x.id.unwrap_or(0)).unwrap_or(0),
-                );
+                let mut connection = get_connection(&res, min, max)?;
 
                 connection.append(res.into_iter().map(|post| {
                     let cursor = PostCursor::new(post.date.unwrap(), post.id.unwrap());
