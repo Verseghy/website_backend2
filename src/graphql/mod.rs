@@ -1,6 +1,6 @@
 mod cache;
-mod resolvers;
-mod types;
+pub mod resolvers;
+pub mod types;
 
 use async_graphql::{
     extensions::apollo_persisted_queries::ApolloPersistedQueries, EmptyMutation, EmptySubscription,
