@@ -6,7 +6,7 @@ use crate::{
     },
     graphql::types::PostCursor,
     select_columns,
-    utils::{create_paginated_posts, Maybe},
+    utils::{create_paginated_posts, db_error, Maybe},
 };
 use async_graphql::{
     connection::{Connection, EmptyFields},
@@ -85,6 +85,6 @@ impl AuthorsQuery {
             .into_model::<Author>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }

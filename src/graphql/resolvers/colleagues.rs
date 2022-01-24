@@ -1,9 +1,9 @@
 use crate::{
     entity::colleagues_data::{Column, Entity as ColleaguesData},
     select_columns,
-    utils::Maybe,
+    utils::{db_error, Maybe},
 };
-use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
+use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
 use sea_orm::{prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
@@ -50,7 +50,7 @@ impl ColleaguesQuery {
             .into_model::<Colleague>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?;
+            .map_err(db_error)?;
 
         if ctx.look_ahead().field("name").exists() {
             res.sort_by(|a, b| {

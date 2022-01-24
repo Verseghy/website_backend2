@@ -1,7 +1,7 @@
 use crate::entity::pages::{Column, Entity as Pages};
 use crate::select_columns;
-use crate::utils::Maybe;
-use async_graphql::{Context, Error, Object, Result, SimpleObject};
+use crate::utils::{db_error, Maybe};
+use async_graphql::{Context, Object, Result, SimpleObject};
 use sea_orm::{entity::prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
@@ -31,6 +31,6 @@ impl PagesQuery {
             .into_model::<Page>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }

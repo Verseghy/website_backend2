@@ -8,7 +8,7 @@ use crate::{
     },
     graphql::types::{Date, PostCursor},
     select_columns,
-    utils::{create_paginated_posts, Maybe},
+    utils::{create_paginated_posts, db_error, Maybe},
 };
 use async_graphql::{
     connection::{Connection, EmptyFields},
@@ -80,7 +80,7 @@ impl Post {
             .into_model::<Author>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 
     async fn labels(&self, ctx: &Context<'_>) -> Result<Vec<Label>> {
@@ -100,7 +100,7 @@ impl Post {
             .into_model::<Label>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }
 
@@ -176,6 +176,6 @@ impl PostsQuery {
             .into_model::<Post>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }

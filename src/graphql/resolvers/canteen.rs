@@ -7,8 +7,9 @@ use crate::{
         canteen_pivot_menus_data,
     },
     graphql::types::Date,
+    utils::db_error,
 };
-use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
+use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
 use chrono::{NaiveDate, Weekday};
 use sea_orm::{
     entity::prelude::*,
@@ -59,7 +60,7 @@ impl Canteen {
             .into_model::<Menu>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }
 
@@ -85,6 +86,6 @@ impl CanteenQuery {
             .into_model::<Canteen>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }

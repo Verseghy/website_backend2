@@ -2,7 +2,7 @@ use crate::{
     entity::events_data::{Column, Entity as EventsData},
     graphql::types::DateTime,
     select_columns,
-    utils::Maybe,
+    utils::{db_error, Maybe},
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
 use chrono::{Datelike, Duration, NaiveDate};
@@ -61,6 +61,6 @@ impl EventsQuery {
             .into_model::<Event>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }

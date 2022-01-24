@@ -2,6 +2,7 @@ use crate::{
     entity::posts_data::{Column, Entity as PostsData},
     graphql::{resolvers::Post, types::PostCursor},
     select_columns_connection,
+    utils::db_error,
 };
 use async_graphql::{
     connection::{query, Connection, Edge, EmptyFields},
@@ -76,7 +77,7 @@ async fn get_published_posts_min_max_id(
             .into_values::<(NaiveDate, u32), QueryMinMax>()
             .one(db)
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     };
     let min = order_by(Order::Asc)
         .await?
@@ -139,7 +140,7 @@ where
                 .into_model::<Post>()
                 .all(db.deref())
                 .await
-                .map_err(|err| Error::new(format!("database error: {}", err)))?;
+                .map_err(db_error)?;
 
             res.sort_by(|a, b| b.date.cmp(&a.date));
 

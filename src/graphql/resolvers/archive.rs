@@ -2,6 +2,7 @@ use super::Post;
 use crate::{
     entity::posts_data::{Column, Entity as PostsData},
     select_columns,
+    utils::db_error,
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
 use chrono::NaiveDate;
@@ -54,7 +55,7 @@ impl Archive {
             .into_model::<Post>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 
     async fn info(&self, ctx: &Context<'_>) -> Result<Vec<Info>> {
@@ -80,7 +81,7 @@ impl Archive {
             .into_model::<Info>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }
 

@@ -3,8 +3,8 @@ use crate::entity::{
     pages,
 };
 use crate::select_columns;
-use crate::utils::Maybe;
-use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
+use crate::utils::{db_error, Maybe};
+use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
 use sea_orm::{
     entity::prelude::*,
     query::{QueryOrder, QuerySelect},
@@ -52,7 +52,7 @@ impl MenuItem {
             .into_values::<_, QuerySlug>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))?
+            .map_err(db_error)?
             .map(|(slug,)| slug))
     }
 
@@ -72,7 +72,7 @@ impl MenuItem {
             .into_model::<MenuItem>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }
 
@@ -97,6 +97,6 @@ impl MenuQuery {
             .into_model::<MenuItem>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }

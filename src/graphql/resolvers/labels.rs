@@ -6,9 +6,9 @@ use crate::{
         posts_pivot_labels_data,
     },
     select_columns,
-    utils::Maybe,
+    utils::{db_error, Maybe},
 };
-use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
+use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
 use sea_orm::{
     prelude::*,
     query::{JoinType, Order, QueryOrder, QuerySelect},
@@ -46,7 +46,7 @@ impl Label {
             .into_model::<Post>()
             .all(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }
 
@@ -67,6 +67,6 @@ impl LabelQuery {
             .into_model::<Label>()
             .one(db.deref())
             .await
-            .map_err(|err| Error::new(format!("database error: {:?}", err)))
+            .map_err(db_error)
     }
 }
