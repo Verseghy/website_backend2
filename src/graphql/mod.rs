@@ -35,6 +35,7 @@ pub async fn create_schema() -> Schema {
     let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
         .extension(Analyzer)
         .extension(ApolloPersistedQueries::new(cache))
+        .limit_complexity(32)
         .finish();
 
     tracing::info!("Schema created");
