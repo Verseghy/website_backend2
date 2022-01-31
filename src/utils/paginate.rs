@@ -10,9 +10,9 @@ use async_graphql::{
 };
 use chrono::NaiveDate;
 use sea_orm::{
-    entity::EntityTrait,
+    entity::{EntityTrait, RelationDef},
     query::{Order, QueryFilter, QueryOrder, QuerySelect},
-    ColumnTrait, DatabaseTransaction, DeriveColumn, EnumIter, IdenStatic, Select,
+    ColumnTrait, DatabaseTransaction, DeriveColumn, EnumIter, IdenStatic, JoinType, Select,
 };
 use sea_query::query::IntoCondition;
 use std::ops::Deref;
@@ -136,6 +136,58 @@ where
 
             let mut res = query
                 .filter(condition)
+                .filter(Column::Published.eq(true))
+                .into_model::<Post>()
+                .all(db.deref())
+                .await
+                .map_err(db_error)?;
+
+            res.sort_by(|a, b| b.date.cmp(&a.date));
+
+            let (min, max) = get_published_posts_min_max_id(db.deref()).await?;
+
+            let mut connection = get_connection(&res, min, max)?;
+
+            connection.append(res.into_iter().map(|post| {
+                let cursor = PostCursor::new(post.date.unwrap(), post.id.unwrap());
+                Edge::new(cursor, post)
+            }));
+
+            Ok::<_, Error>(connection)
+        },
+    )
+    .await
+}
+
+pub async fn create_paginated_posts_label<C>(
+    after: Option<String>,
+    before: Option<String>,
+    first: Option<i32>,
+    last: Option<i32>,
+    ctx: &Context<'_>,
+    db: &DatabaseTransaction,
+    condition: C,
+    join: RelationDef,
+) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>>
+where
+    C: IntoCondition,
+{
+    query(
+        after,
+        before,
+        first,
+        last,
+        |after, before, first, last| async move {
+            let mut query = build_paginated_posts(after, before, first, last);
+
+            select_columns_connection!(ctx, query, Column);
+            select_columns_connection!(ctx, query, 
+                "author" => Column::AuthorId,
+                "labels" => Column::Id);
+
+            let mut res = query
+                .filter(condition)
+                .join_rev(JoinType::Join, join)
                 .filter(Column::Published.eq(true))
                 .into_model::<Post>()
                 .all(db.deref())

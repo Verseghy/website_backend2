@@ -1,19 +1,19 @@
 use super::Post;
 use crate::{
     entity::{
-        posts_data::{self, Entity as PostsData},
+        posts_data,
         posts_labels::{self, Entity as PostsLabels},
         posts_pivot_labels_data,
     },
+    graphql::types::PostCursor,
     select_columns,
-    utils::{db_error, Maybe},
+    utils::{create_paginated_posts_label, db_error, Maybe},
 };
-use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
-use sea_orm::{
-    prelude::*,
-    query::{JoinType, Order, QueryOrder, QuerySelect},
-    DatabaseTransaction, FromQueryResult,
+use async_graphql::{
+    connection::{Connection, EmptyFields},
+    ComplexObject, Context, Object, Result, SimpleObject,
 };
+use sea_orm::{prelude::*, query::QuerySelect, Condition, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
@@ -26,27 +26,40 @@ pub struct Label {
 
 #[ComplexObject]
 impl Label {
-    async fn posts(&self, ctx: &Context<'_>) -> Result<Vec<Post>> {
+    async fn posts(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(default = false)] featured: bool,
+        after: Option<String>,
+        before: Option<String>,
+        first: Option<i32>,
+        last: Option<i32>,
+    ) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
-        let mut query = PostsData::find().select_only();
 
-        select_columns!(ctx, query, posts_data::Column);
-        select_columns!(ctx, query,
-            "author" => posts_data::Column::AuthorId,
-            "labels" => posts_data::Column::Id);
+        let condition = {
+            let condition = if featured {
+                Some(posts_data::Column::Featured.eq(true))
+            } else {
+                None
+            };
 
-        query
-            .filter(posts_pivot_labels_data::Column::LabelsId.eq(self.id.deref().unwrap()))
-            .filter(posts_data::Column::Published.eq(true))
-            .join_rev(
-                JoinType::Join,
-                posts_pivot_labels_data::Relation::Posts.def(),
-            )
-            .order_by(posts_data::Column::Id, Order::Desc)
-            .into_model::<Post>()
-            .all(db.deref())
-            .await
-            .map_err(db_error)
+            Condition::all()
+                .add_option(condition)
+                .add(posts_pivot_labels_data::Column::LabelsId.eq(self.id.deref().unwrap()))
+        };
+
+        create_paginated_posts_label(
+            after,
+            before,
+            first,
+            last,
+            ctx,
+            db,
+            condition,
+            posts_pivot_labels_data::Relation::Posts.def(),
+        )
+        .await
     }
 }
 
