@@ -3,8 +3,8 @@ pub mod resolvers;
 pub mod types;
 
 use async_graphql::{
-    extensions::apollo_persisted_queries::ApolloPersistedQueries, EmptyMutation, EmptySubscription,
-    MergedObject,
+    extensions::{apollo_persisted_queries::ApolloPersistedQueries, Analyzer},
+    EmptyMutation, EmptySubscription, MergedObject,
 };
 use cache::RedisCache;
 use resolvers::{
@@ -33,6 +33,7 @@ pub async fn create_schema() -> Schema {
     let cache = RedisCache::new(redis_url.as_str()).expect("Could not create redis cache");
 
     let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
+        .extension(Analyzer)
         .extension(ApolloPersistedQueries::new(cache))
         .finish();
 
