@@ -7,7 +7,7 @@ use crate::{
     },
     graphql::types::PostCursor,
     select_columns,
-    utils::{create_paginated_posts_label, db_error, Maybe},
+    utils::{create_paginated_posts, db_error, Maybe},
 };
 use async_graphql::{
     connection::{Connection, EmptyFields},
@@ -49,7 +49,7 @@ impl Label {
                 .add(posts_pivot_labels_data::Column::LabelsId.eq(self.id.deref().unwrap()))
         };
 
-        create_paginated_posts_label(
+        create_paginated_posts(
             after,
             before,
             first,
@@ -57,7 +57,7 @@ impl Label {
             ctx,
             db,
             condition,
-            posts_pivot_labels_data::Relation::Posts.def(),
+            Some(posts_pivot_labels_data::Relation::Posts.def()),
         )
         .await
     }

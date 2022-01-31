@@ -129,7 +129,7 @@ impl PostsQuery {
             Condition::all().add_option(condition)
         };
 
-        create_paginated_posts(after, before, first, last, ctx, db, condition).await
+        create_paginated_posts(after, before, first, last, ctx, db, condition, None).await
     }
 
     async fn search(
@@ -147,7 +147,7 @@ impl PostsQuery {
             .add(posts_data::Column::Description.like(format!("%{}%", term).as_str()))
             .add(posts_data::Column::Title.like(format!("%{}%", term).as_str()));
 
-        create_paginated_posts(after, before, first, last, ctx, db, condition).await
+        create_paginated_posts(after, before, first, last, ctx, db, condition, None).await
     }
 
     async fn post(

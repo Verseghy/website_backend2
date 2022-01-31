@@ -64,7 +64,7 @@ impl Author {
                 .add(posts_data::Column::AuthorId.eq(self.id.unwrap()))
         };
 
-        create_paginated_posts(after, before, first, last, ctx, db, condition).await
+        create_paginated_posts(after, before, first, last, ctx, db, condition, None).await
     }
 }
 
