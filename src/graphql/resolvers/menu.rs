@@ -12,7 +12,7 @@ use sea_orm::{
 };
 use std::{ops::Deref, sync::Arc};
 
-#[derive(SimpleObject, Debug)]
+#[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
 pub struct MenuItem {
     #[graphql(skip)]
@@ -22,18 +22,6 @@ pub struct MenuItem {
     link: Maybe<Option<String>>,
     #[graphql(skip)]
     page_id: Option<u32>,
-}
-
-impl FromQueryResult for MenuItem {
-    fn from_query_result(row: &QueryResult, pre: &str) -> Result<Self, DbErr> {
-        Ok(Self {
-            id: row.try_get(pre, "id")?,
-            name: row.try_get(pre, "name")?,
-            r#type: row.try_get(pre, "type")?,
-            link: row.try_get(pre, "link")?,
-            page_id: row.try_get(pre, "page_id")?,
-        })
-    }
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]

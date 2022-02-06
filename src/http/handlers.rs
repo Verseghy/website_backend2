@@ -5,7 +5,7 @@ use async_graphql::{
     Response, ServerError,
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-use sea_orm::{ConnectionTrait, DatabaseConnection};
+use sea_orm::{DatabaseConnection, TransactionTrait};
 use std::sync::Arc;
 
 pub async fn graphql(

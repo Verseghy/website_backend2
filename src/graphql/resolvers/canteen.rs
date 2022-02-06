@@ -18,21 +18,11 @@ use sea_orm::{
 };
 use std::{ops::Deref, sync::Arc};
 
-#[derive(SimpleObject, Debug)]
+#[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Menu {
     id: Maybe<u32>,
     menu: Maybe<String>,
     r#type: Maybe<u16>,
-}
-
-impl FromQueryResult for Menu {
-    fn from_query_result(res: &QueryResult, pre: &str) -> Result<Self, DbErr> {
-        Ok(Menu {
-            id: res.try_get(pre, "id")?,
-            menu: res.try_get(pre, "menu")?,
-            r#type: res.try_get(pre, "type")?,
-        })
-    }
 }
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
