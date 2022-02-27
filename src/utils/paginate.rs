@@ -109,6 +109,7 @@ fn get_connection(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn create_paginated_posts<C>(
     after: Option<String>,
     before: Option<String>,
