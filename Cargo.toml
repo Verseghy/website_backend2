@@ -19,4 +19,4 @@ thiserror = "1.0.30"
 prometheus = "0.13.0"
 
 [dev-dependencies]
-test-case = "1.2.1"
+test-case = "2.0.0"
