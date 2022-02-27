@@ -5,12 +5,14 @@ use async_graphql::{
     Response, ServerError,
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
+use prometheus::{IntCounterVec, Registry, TextEncoder};
 use sea_orm::{DatabaseConnection, TransactionTrait};
 use std::sync::Arc;
 
 pub async fn graphql(
     database: web::Data<DatabaseConnection>,
     schema: web::Data<Schema>,
+    counter: web::Data<IntCounterVec>,
     request: GraphQLRequest,
 ) -> GraphQLResponse {
     let request = request.into_inner();
@@ -22,7 +24,13 @@ pub async fn graphql(
     let res = match database.begin().await {
         Ok(tx) => {
             let tx = Arc::new(tx);
-            let res = schema.execute(request.data(Arc::clone(&tx))).await;
+            let res = schema
+                .execute(
+                    request
+                        .data(Arc::clone(&tx))
+                        .data((*counter.into_inner()).clone()),
+                )
+                .await;
 
             if let Err(err) = Arc::try_unwrap(tx).unwrap().commit().await {
                 tracing::error!("Could not commit transaction: {:?}", err);
@@ -64,4 +72,15 @@ pub async fn liveness() -> HttpResponse {
     }
 
     HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR)
+}
+
+pub async fn metrics(registry: web::Data<Registry>) -> HttpResponse {
+    let encoder = TextEncoder::new();
+    let metric_families = registry.gather();
+
+    if let Ok(metrics) = encoder.encode_to_string(&metric_families) {
+        HttpResponse::Ok().body(metrics)
+    } else {
+        HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR)
+    }
 }

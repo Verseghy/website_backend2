@@ -14,6 +14,7 @@ use async_graphql::{
     connection::{Connection, EmptyFields},
     ComplexObject, Context, Error, Object, Result, SimpleObject,
 };
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{
     prelude::*,
     query::{JoinType, Order, QueryOrder, QuerySelect},
@@ -118,6 +119,10 @@ impl PostsQuery {
         first: Option<i32>,
         last: Option<i32>,
     ) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "posts"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let condition = {
             let condition = if featured {
@@ -141,6 +146,10 @@ impl PostsQuery {
         first: Option<i32>,
         last: Option<i32>,
     ) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "search"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let condition = Condition::any()
             .add(posts_data::Column::Content.like(format!("%{}%", term).as_str()))
@@ -156,6 +165,10 @@ impl PostsQuery {
         id: u32,
         token: Option<String>,
     ) -> Result<Option<Post>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "post"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsData::find().select_only();
 

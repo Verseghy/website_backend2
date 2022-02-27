@@ -5,6 +5,7 @@ use crate::entity::{
 use crate::select_columns;
 use crate::utils::{db_error, Maybe};
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{
     entity::prelude::*,
     query::{QueryOrder, QuerySelect},
@@ -70,6 +71,10 @@ pub struct MenuQuery;
 #[Object]
 impl MenuQuery {
     async fn menu(&self, ctx: &Context<'_>) -> Result<Vec<MenuItem>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "menu"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = MenuItems::find().select_only();
 

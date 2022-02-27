@@ -12,6 +12,7 @@ use async_graphql::{
     connection::{Connection, EmptyFields},
     ComplexObject, Context, Error, Object, Result, SimpleObject,
 };
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{prelude::*, query::QuerySelect, Condition, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
@@ -74,6 +75,10 @@ pub struct AuthorsQuery;
 #[Object]
 impl AuthorsQuery {
     pub async fn author(&self, ctx: &Context<'_>, id: u32) -> Result<Option<Author>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "author"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsAuthors::find().select_only();
 

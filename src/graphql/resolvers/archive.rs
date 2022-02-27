@@ -6,6 +6,7 @@ use crate::{
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
 use chrono::NaiveDate;
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{
     entity::prelude::*,
     query::{Order, QueryOrder, QuerySelect},
@@ -90,7 +91,11 @@ pub struct ArchiveQuery;
 
 #[Object]
 impl ArchiveQuery {
-    async fn archive(&self) -> Result<Archive> {
+    async fn archive(&self, ctx: &Context<'_>) -> Result<Archive> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "archive"})
+            .inc();
+
         Ok(Archive)
     }
 }

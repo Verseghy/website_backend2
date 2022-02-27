@@ -4,6 +4,7 @@ use crate::{
     utils::{db_error, Maybe},
 };
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
@@ -41,6 +42,10 @@ pub struct ColleaguesQuery;
 #[Object]
 impl ColleaguesQuery {
     async fn colleagues(&self, ctx: &Context<'_>) -> Result<Vec<Colleague>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "colleagues"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = ColleaguesData::find().select_only();
 

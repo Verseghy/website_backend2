@@ -11,6 +11,7 @@ use crate::{
 };
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
 use chrono::{NaiveDate, Weekday};
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{
     entity::prelude::*,
     query::{Order, QueryOrder, QuerySelect},
@@ -60,6 +61,10 @@ pub struct CanteenQuery;
 #[Object]
 impl CanteenQuery {
     async fn canteen(&self, ctx: &Context<'_>, year: i32, week: i32) -> Result<Vec<Canteen>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "canteen"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = CanteenData::find().select_only();
 

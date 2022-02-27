@@ -2,6 +2,7 @@ use crate::entity::pages::{Column, Entity as Pages};
 use crate::select_columns;
 use crate::utils::{db_error, Maybe};
 use async_graphql::{Context, Object, Result, SimpleObject};
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{entity::prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
@@ -21,6 +22,10 @@ pub struct PagesQuery;
 #[Object]
 impl PagesQuery {
     async fn page(&self, ctx: &Context<'_>, slug: String) -> Result<Option<Page>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "page"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = Pages::find().select_only();
 

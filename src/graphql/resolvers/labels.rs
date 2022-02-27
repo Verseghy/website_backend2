@@ -13,6 +13,7 @@ use async_graphql::{
     connection::{Connection, EmptyFields},
     ComplexObject, Context, Object, Result, SimpleObject,
 };
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{prelude::*, query::QuerySelect, Condition, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
@@ -69,6 +70,10 @@ pub struct LabelQuery;
 #[Object]
 impl LabelQuery {
     pub async fn label(&self, ctx: &Context<'_>, id: u32) -> Result<Option<Label>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "label"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsLabels::find().select_only();
 

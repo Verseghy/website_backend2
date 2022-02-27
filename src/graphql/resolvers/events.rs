@@ -6,6 +6,7 @@ use crate::{
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
 use chrono::{Datelike, Duration, NaiveDate};
+use prometheus::{labels, IntCounterVec};
 use sea_orm::{
     prelude::*,
     query::{Order, QueryOrder, QuerySelect},
@@ -29,6 +30,10 @@ pub struct EventsQuery;
 #[Object]
 impl EventsQuery {
     async fn events(&self, ctx: &Context<'_>, year: i32, month: u32) -> Result<Vec<Event>> {
+        ctx.data_unchecked::<IntCounterVec>()
+            .with(&labels! {"resource" => "events"})
+            .inc();
+
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = EventsData::find().select_only();
 
