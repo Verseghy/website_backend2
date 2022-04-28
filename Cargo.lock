@@ -1944,7 +1944,7 @@ dependencies = [
  "ouroboros",
  "rust_decimal",
  "sea-orm-macros",
- "sea-query",
+ "sea-query 0.21.0",
  "sea-strum",
  "serde",
  "serde_json",
@@ -1981,6 +1981,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "sea-query"
+version = "0.24.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49245eed7d8e8636bfa59f1c3fdfadb75f83ab0126efb63e0a2395f7a6664a95"
+dependencies = [
+ "sea-query-derive",
+ "sea-query-driver",
+]
+
+[[package]]
 name = "sea-query-derive"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1991,6 +2001,17 @@ dependencies = [
  "quote",
  "syn",
  "thiserror",
+]
+
+[[package]]
+name = "sea-query-driver"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e3953baee94dcb90f0e19e8b4b91b91e9394867b0fc1886d0221cfc6d0439f5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -2771,7 +2792,7 @@ dependencies = [
  "prometheus",
  "redis",
  "sea-orm",
- "sea-query",
+ "sea-query 0.24.4",
  "thiserror",
  "tokio",
  "tracing",
