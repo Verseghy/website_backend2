@@ -16,4 +16,4 @@ tracing = "0.1.29"
 tracing-subscriber = { version = "0.3.5", features= ["env-filter"] }
 dotenv = "0.15.0"
 thiserror = "1.0.30"
-prometheus = "0.13.0"
+prometheus = "0.13.1"
