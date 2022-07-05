@@ -10,7 +10,8 @@ RUN cargo build --release && \
 
 COPY src ./src
 RUN rm target/release/deps/website_backend2* && \
-    cargo build --release
+    cargo build --release && \
+    strip -s target/release/website_backend2
 
 FROM alpine
 WORKDIR /app
