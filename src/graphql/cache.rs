@@ -1,5 +1,5 @@
 use async_graphql::{async_trait::async_trait, extensions::apollo_persisted_queries::CacheStorage};
-use redis::{aio::ConnectionManager, RedisResult, AsyncCommands};
+use redis::{aio::ConnectionManager, AsyncCommands, RedisResult};
 
 #[derive(Clone)]
 pub struct RedisCache {
@@ -8,8 +8,8 @@ pub struct RedisCache {
 
 impl RedisCache {
     pub async fn new() -> RedisResult<Self> {
-        let url = std::env::var("REDIS_URL")
-            .expect("Could not find REDIS_URL environment variable");
+        let url =
+            std::env::var("REDIS_URL").expect("Could not find REDIS_URL environment variable");
         let client = redis::Client::open(url)?;
 
         Ok(Self {

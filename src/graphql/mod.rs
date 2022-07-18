@@ -28,7 +28,9 @@ pub struct Query(
 pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>;
 
 pub async fn create_schema() -> Schema {
-    let cache = RedisCache::new().await.expect("Could not create redis cache");
+    let cache = RedisCache::new()
+        .await
+        .expect("Could not create redis cache");
 
     let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
         .extension(Analyzer)
