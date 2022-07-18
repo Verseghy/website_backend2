@@ -154,7 +154,7 @@ where
 
             let mut connection = get_connection(&res, min, max)?;
 
-            connection.append(res.into_iter().map(|post| {
+            connection.edges.extend(res.into_iter().map(|post| {
                 let cursor = PostCursor::new(post.date.unwrap(), post.id.unwrap());
                 Edge::new(cursor, post)
             }));
