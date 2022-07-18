@@ -1,19 +1,19 @@
 use async_graphql::{async_trait::async_trait, extensions::apollo_persisted_queries::CacheStorage};
-use redis::{Commands, Connection, RedisResult};
-use std::sync::{Arc, Mutex};
+use redis::{aio::ConnectionManager, RedisResult, AsyncCommands};
 
 #[derive(Clone)]
 pub struct RedisCache {
-    conn: Arc<Mutex<Connection>>,
+    manager: ConnectionManager,
 }
 
 impl RedisCache {
-    pub fn new(uri: &str) -> RedisResult<Self> {
-        let client = redis::Client::open(uri)?;
-        let conn = client.get_connection()?;
+    pub async fn new() -> RedisResult<Self> {
+        let url = std::env::var("REDIS_URL")
+            .expect("Could not find REDIS_URL environment variable");
+        let client = redis::Client::open(url)?;
 
         Ok(Self {
-            conn: Arc::new(Mutex::new(conn)),
+            manager: ConnectionManager::new(client).await?,
         })
     }
 }
@@ -21,12 +21,12 @@ impl RedisCache {
 #[async_trait]
 impl CacheStorage for RedisCache {
     async fn get(&self, key: String) -> Option<String> {
-        let mut lock = self.conn.lock().unwrap();
-        lock.get(key).ok()
+        let mut conn = self.manager.clone();
+        conn.get(key).await.ok()
     }
 
     async fn set(&self, key: String, query: String) {
-        let mut lock = self.conn.lock().unwrap();
-        let _: RedisResult<()> = lock.set(key, query);
+        let mut conn = self.manager.clone();
+        let _: RedisResult<()> = conn.set(key, query).await;
     }
 }

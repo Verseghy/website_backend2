@@ -28,9 +28,7 @@ pub struct Query(
 pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>;
 
 pub async fn create_schema() -> Schema {
-    let redis_url =
-        std::env::var("REDIS_URL").expect("Could not find REDIS_URL environment variable");
-    let cache = RedisCache::new(redis_url.as_str()).expect("Could not create redis cache");
+    let cache = RedisCache::new().await.expect("Could not create redis cache");
 
     let schema = Schema::build(Query::default(), EmptyMutation, EmptySubscription)
         .extension(Analyzer)
