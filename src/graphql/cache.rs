@@ -1,4 +1,5 @@
 use async_graphql::{async_trait::async_trait, extensions::apollo_persisted_queries::CacheStorage};
+use async_graphql_parser::types::ExecutableDocument;
 use redis::{aio::ConnectionManager, AsyncCommands, RedisResult};
 
 #[derive(Clone)]
@@ -20,13 +21,26 @@ impl RedisCache {
 
 #[async_trait]
 impl CacheStorage for RedisCache {
-    async fn get(&self, key: String) -> Option<String> {
+    async fn get(&self, key: String) -> Option<ExecutableDocument> {
         let mut conn = self.manager.clone();
-        conn.get(key).await.ok()
+
+        let res: Vec<u8> = conn.get(&key).await.ok()?;
+        match bincode::deserialize(&res) {
+            Ok(document) => document,
+            Err(_) => {
+                let _: RedisResult<()> = conn.del(&key).await;
+                None
+            }
+        }
     }
 
-    async fn set(&self, key: String, query: String) {
+    async fn set(&self, key: String, document: ExecutableDocument) {
         let mut conn = self.manager.clone();
-        let _: RedisResult<()> = conn.set(key, query).await;
+
+        if let Ok(data) = bincode::serialize(&document) {
+            let _: RedisResult<()> = conn.set(key, &data).await;
+        } else {
+            tracing::warn!("cache: failed to serialize ExecutableDocument")
+        }
     }
 }
