@@ -72,7 +72,7 @@ async fn get_published_posts_min_max_id(
             .column(Column::Date)
             .column(Column::Id)
             .filter(Column::Published.eq(true))
-            .order_by(Column::Date, order)
+            .order_by(Column::Date, order.clone())
             .order_by(Column::Id, order)
             .into_values::<(NaiveDate, u32), QueryMinMax>()
             .one(db)

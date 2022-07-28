@@ -20,7 +20,7 @@ impl<T: TryGetable + Default> TryGetable for Maybe<T> {
     fn try_get(res: &QueryResult, pre: &str, col: &str) -> Result<Self, TryGetError> {
         match T::try_get(res, pre, col) {
             Ok(value) => Ok(Maybe(Some(value))),
-            Err(TryGetError::Null) => Ok(Maybe(Some(T::default()))),
+            Err(TryGetError::Null(_)) => Ok(Maybe(Some(T::default()))),
             Err(_) => Ok(Maybe(None)),
         }
     }
