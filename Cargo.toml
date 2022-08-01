@@ -13,7 +13,7 @@ chrono = { version = "0.4.19", default-features=false }
 sea-orm = { version = "0.9.1", features = ["sqlx-mysql", "runtime-actix-rustls", "macros", "with-chrono", "with-json" ], default-features = false }
 sea-query = { version = "0.26.2", default-features = false, features = ["derive", "backend-mysql"] }
 redis = { version = "0.21.5", features = ["aio", "tokio-comp", "connection-manager"] }
-tracing = "0.1.35"
+tracing = "0.1.36"
 tracing-subscriber = { version = "0.3.15", features= ["env-filter"] }
 dotenv = "0.15.0"
 thiserror = "1.0.31"
