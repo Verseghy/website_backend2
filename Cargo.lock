@@ -357,9 +357,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-actix-web"
-version = "4.0.5"
+version = "4.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd518a1f532a4d19ec4e8622cf6574bbaa953994aaec49d61c800a07495845f4"
+checksum = "5d0f66f1435e477e66ef1ba698da2e4ebfb480c4f08a41ec6edae4e43622a794"
 dependencies = [
  "actix",
  "actix-http",
