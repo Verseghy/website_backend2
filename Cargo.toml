@@ -9,7 +9,7 @@ tokio = { version = "1.20.0", features = ["rt-multi-thread", "macros", "signal",
 async-graphql = { version = "4.0.6", features = ["chrono", "apollo_persisted_queries"] }
 async-graphql-parser = "4.0.5"
 async-graphql-actix-web = "4.0.5"
-chrono = { version = "0.4.19", default-features=false }
+chrono = { version = "0.4.22", default-features=false }
 sea-orm = { version = "0.9.1", features = ["sqlx-mysql", "runtime-actix-rustls", "macros", "with-chrono", "with-json" ], default-features = false }
 sea-query = { version = "0.26.2", default-features = false, features = ["derive", "backend-mysql"] }
 redis = { version = "0.21.5", features = ["aio", "tokio-comp", "connection-manager"] }
