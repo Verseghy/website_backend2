@@ -5,7 +5,11 @@ use crate::{
 };
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
 use prometheus::{labels, IntCounterVec};
-use sea_orm::{prelude::*, query::{QuerySelect, QueryOrder}, DatabaseTransaction, FromQueryResult};
+use sea_orm::{
+    prelude::*,
+    query::{QueryOrder, QuerySelect},
+    DatabaseTransaction, FromQueryResult,
+};
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
