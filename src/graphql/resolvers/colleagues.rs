@@ -5,7 +5,7 @@ use crate::{
 };
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
 use prometheus::{labels, IntCounterVec};
-use sea_orm::{prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
+use sea_orm::{prelude::*, query::{QuerySelect, QueryOrder}, DatabaseTransaction, FromQueryResult};
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
@@ -52,6 +52,7 @@ impl ColleaguesQuery {
         select_columns!(ctx, query, Column);
 
         let mut res = query
+            .order_by_asc(Column::Name)
             .into_model::<Colleague>()
             .all(db.deref())
             .await
