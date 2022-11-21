@@ -1891,7 +1891,7 @@ dependencies = [
  "once_cell",
  "ouroboros",
  "sea-orm-macros",
- "sea-query",
+ "sea-query 0.26.4",
  "sea-strum",
  "serde",
  "serde_json",
@@ -1915,15 +1915,24 @@ dependencies = [
 
 [[package]]
 name = "sea-query"
-version = "0.26.2"
+version = "0.26.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2997a3e57614c0ff2212890e143deadb4a31f8057cbe7fc163daa3f297a33527"
+checksum = "15e36a9680854b4e5d2ea5230f94e7ef81562260905b770fe20c3df9b3e7a536"
 dependencies = [
  "chrono",
  "postgres-types",
  "sea-query-derive",
  "sea-query-driver",
  "serde_json",
+]
+
+[[package]]
+name = "sea-query"
+version = "0.27.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4f0fc4d8e44e1d51c739a68d336252a18bc59553778075d5e32649be6ec92ed"
+dependencies = [
+ "sea-query-derive",
 ]
 
 [[package]]
@@ -2705,7 +2714,7 @@ dependencies = [
  "prometheus",
  "redis",
  "sea-orm",
- "sea-query",
+ "sea-query 0.27.2",
  "thiserror",
  "tokio",
  "tracing",
