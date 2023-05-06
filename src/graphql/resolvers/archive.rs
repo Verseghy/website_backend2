@@ -38,7 +38,8 @@ impl Archive {
 
         let start = NaiveDate::from_ymd_opt(year, month, 1)
             .ok_or_else(|| Error::new("invalid date"))?
-            .and_hms(0, 0, 0);
+            .and_hms_opt(0, 0, 0)
+            .unwrap();
 
         let end = if month < 12 {
             NaiveDate::from_ymd_opt(year, month + 1, 1)
@@ -46,7 +47,8 @@ impl Archive {
             NaiveDate::from_ymd_opt(year + 1, 1, 1)
         }
         .ok_or_else(|| Error::new("invalid date"))?
-        .and_hms(0, 0, 0);
+        .and_hms_opt(0, 0, 0)
+        .unwrap();
 
         query
             .filter(Column::Date.gte(start))
