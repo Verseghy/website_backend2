@@ -17,8 +17,8 @@ impl<T: Default> Deref for Maybe<T> {
 }
 
 impl<T: TryGetable + Default> TryGetable for Maybe<T> {
-    fn try_get(res: &QueryResult, pre: &str, col: &str) -> Result<Self, TryGetError> {
-        match T::try_get(res, pre, col) {
+    fn try_get_by<I: sea_orm::ColIdx>(res: &QueryResult, index: I) -> Result<Self, TryGetError> {
+        match T::try_get_by(res, index) {
             Ok(value) => Ok(Maybe(Some(value))),
             Err(TryGetError::Null(_)) => Ok(Maybe(Some(T::default()))),
             Err(_) => Ok(Maybe(None)),

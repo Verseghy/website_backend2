@@ -9,9 +9,7 @@ pub struct Model {
     pub id: i32,
     pub title: String,
     pub color: String,
-    #[sea_orm(column_type = "Custom(\"LONGTEXT\".to_owned())", nullable)]
     pub description: Option<String>,
-    #[sea_orm(column_type = "Custom(\"LONGTEXT\".to_owned())", nullable)]
     pub content: Option<String>,
     pub index_image: Option<String>,
     pub author_id: Option<i32>,

@@ -27,8 +27,8 @@ impl ScalarType for Date {
 }
 
 impl TryGetable for Date {
-    fn try_get(res: &QueryResult, pre: &str, col: &str) -> Result<Self, TryGetError> {
-        Ok(Date(NaiveDate::try_get(res, pre, col)?))
+    fn try_get_by<I: sea_orm::ColIdx>(res: &QueryResult, index: I) -> Result<Self, TryGetError> {
+        Ok(Date(NaiveDate::try_get_by(res, index)?))
     }
 }
 
