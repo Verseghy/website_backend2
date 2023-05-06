@@ -34,6 +34,6 @@ impl TryGetable for DateTime {
 
 impl Default for DateTime {
     fn default() -> Self {
-        DateTime(NaiveDateTime::from_timestamp(0, 0))
+        DateTime(NaiveDateTime::from_timestamp_millis(0).unwrap())
     }
 }

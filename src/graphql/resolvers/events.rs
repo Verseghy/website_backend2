@@ -42,7 +42,8 @@ impl EventsQuery {
         let start = {
             let start = NaiveDate::from_ymd_opt(year, month, 1)
                 .ok_or_else(|| Error::new("invalid date"))?
-                .and_hms(0, 0, 0);
+                .and_hms_opt(0, 0, 0)
+                .unwrap();
 
             start - Duration::days(start.weekday().num_days_from_monday().into())
         };
@@ -54,7 +55,8 @@ impl EventsQuery {
                 NaiveDate::from_ymd_opt(year + 1, 1, 1)
             }
             .ok_or_else(|| Error::new("invalid date"))?
-            .and_hms(0, 0, 0);
+            .and_hms_opt(0, 0, 0)
+            .unwrap();
 
             end + Duration::days((6 - end.weekday().num_days_from_monday()).into())
         };

@@ -34,6 +34,6 @@ impl TryGetable for Date {
 
 impl Default for Date {
     fn default() -> Self {
-        Date(NaiveDate::from_ymd(1970, 1, 1))
+        Date(NaiveDate::from_ymd_opt(1970, 1, 1).unwrap())
     }
 }
