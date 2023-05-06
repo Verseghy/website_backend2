@@ -27,8 +27,8 @@ impl ScalarType for DateTime {
 }
 
 impl TryGetable for DateTime {
-    fn try_get(res: &QueryResult, pre: &str, col: &str) -> Result<Self, TryGetError> {
-        Ok(DateTime(NaiveDateTime::try_get(res, pre, col)?))
+    fn try_get_by<I: sea_orm::ColIdx>(res: &QueryResult, index: I) -> Result<Self, TryGetError> {
+        Ok(DateTime(NaiveDateTime::try_get_by(res, index)?))
     }
 }
 

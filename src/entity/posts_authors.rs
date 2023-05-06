@@ -8,7 +8,6 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub name: String,
-    #[sea_orm(column_type = "Custom(\"LONGTEXT\".to_owned())", nullable)]
     pub description: Option<String>,
     pub image: Option<String>,
 }
