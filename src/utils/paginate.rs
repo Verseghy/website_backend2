@@ -12,7 +12,7 @@ use chrono::NaiveDate;
 use sea_orm::{
     entity::{EntityTrait, RelationDef},
     query::{Order, QueryFilter, QueryOrder, QuerySelect},
-    ColumnTrait, DatabaseTransaction, DeriveColumn, EnumIter, IdenStatic, JoinType, Select,
+    ColumnTrait, DatabaseTransaction, DeriveColumn, EnumIter, JoinType, Select,
 };
 use sea_query::query::IntoCondition;
 use std::ops::Deref;
