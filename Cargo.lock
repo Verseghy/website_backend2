@@ -409,9 +409,9 @@ dependencies = [
 
 [[package]]
 name = "async-graphql-parser"
-version = "5.0.7"
+version = "5.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "631770464ad2492da9af6b70048e9e477ef7c1e55fdbfb0719f3330cfa87d8e9"
+checksum = "ecc308cd3bc611ee86c9cf19182d2b5ee583da40761970e41207f088be3db18f"
 dependencies = [
  "async-graphql-value",
  "pest",
