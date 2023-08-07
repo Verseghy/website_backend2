@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 actix-web = "4.3.1"
 tokio = { version = "1.28.0", features = ["rt-multi-thread", "macros", "signal", "fs"] }
-async-graphql = { version = "5.0.7", features = ["chrono", "apollo_persisted_queries"] }
+async-graphql = { version = "6.0.1", features = ["chrono", "apollo_persisted_queries"] }
 async-graphql-parser = "5.0.7"
 async-graphql-actix-web = "5.0.7"
 chrono = { version = "0.4.24", default-features=false }
