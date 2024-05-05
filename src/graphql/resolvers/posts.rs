@@ -35,7 +35,7 @@ pub struct Post {
     #[graphql(skip)]
     pub author_id: Maybe<u32>,
     #[graphql(skip)]
-    pub images: Maybe<Json>,
+    pub images: Maybe<serde_json::Value>,
     pub date: Maybe<Date>,
 }
 
@@ -53,8 +53,8 @@ impl Post {
     }
 
     async fn images(&self) -> Result<Vec<String>> {
-        if let Some(Json::Array(ref arr)) = &*self.images {
-            Ok(arr
+        match &*self.images {
+            Some(Json::Array(arr)) => Ok(arr
                 .iter()
                 .filter(|elem| elem.is_string())
                 .map(|elem| {
@@ -63,9 +63,18 @@ impl Post {
                         elem.as_str().unwrap()
                     )
                 })
-                .collect())
-        } else {
-            Err(Error::new("invalid data in database"))
+                .collect()),
+            Some(Json::Object(map)) => Ok(map
+                .values()
+                .filter(|elem| elem.is_string())
+                .map(|elem| {
+                    format!(
+                        "https://backend.verseghy-gimnazium.net/storage/posts_images/{}",
+                        elem.as_str().unwrap()
+                    )
+                })
+                .collect()),
+            _ => Err(Error::new("invalid data in database")),
         }
     }
 
