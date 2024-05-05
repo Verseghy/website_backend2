@@ -2,7 +2,7 @@ version: '3'
 
 services:
   database:
-    image: mysql:5.7
+    image: docker.io/mysql:8
     environment:
       - "MYSQL_DATABASE=backend"
       - "MYSQL_USER=backend"
@@ -11,7 +11,7 @@ services:
     ports:
         - "33061:3306"
   redis:
-    image: redis:6.2-alpine
+    image: docker.io/redis:6.2-alpine
     environment:
       - "MASTER=true"
     ports:
