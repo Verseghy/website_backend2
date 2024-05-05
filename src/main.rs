@@ -12,19 +12,25 @@ use actix_web::{
 };
 use prometheus::{IntCounterVec, Opts, Registry};
 use std::{io, net::SocketAddr};
+use tracing::level_filters::LevelFilter;
+use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Layer};
 
 const GRAPHQL_PATH: &str = "/graphql";
+
+fn init_logger() {
+    let env_filter = EnvFilter::builder()
+        .with_default_directive(LevelFilter::INFO.into())
+        .from_env_lossy();
+
+    tracing_subscriber::registry()
+        .with(fmt::layer().with_line_number(true).with_filter(env_filter))
+        .init();
+}
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     dotenv::dotenv().ok();
-
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        .with_test_writer()
-        .with_env_filter("warn,website_backend=debug")
-        .compact()
-        .init();
+    init_logger();
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
 
