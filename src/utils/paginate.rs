@@ -15,7 +15,6 @@ use sea_orm::{
     ColumnTrait, DatabaseTransaction, DeriveColumn, EnumIter, JoinType, Select,
 };
 use sea_query::query::IntoCondition;
-use std::ops::Deref;
 
 fn build_paginated_posts(
     after: Option<PostCursor>,
@@ -144,13 +143,13 @@ where
                 .filter(condition)
                 .filter(Column::Published.eq(true))
                 .into_model::<Post>()
-                .all(db.deref())
+                .all(db)
                 .await
                 .map_err(db_error)?;
 
             res.sort_by(|a, b| b.date.cmp(&a.date));
 
-            let (min, max) = get_published_posts_min_max_id(db.deref()).await?;
+            let (min, max) = get_published_posts_min_max_id(db).await?;
 
             let mut connection = get_connection(&res, min, max)?;
 
