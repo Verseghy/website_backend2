@@ -13,7 +13,7 @@ sea-orm = { version = "0.12.5", features = ["sqlx-mysql", "runtime-actix-rustls"
 sea-query = { version = "0.30.7", default-features = false, features = ["derive", "backend-mysql"] }
 redis = { version = "0.25.3", features = ["aio", "tokio-comp", "connection-manager"] }
 tracing = { version = "0.1.40", features = ["log"] }
-tracing-subscriber = { version = "0.3.17", features= ["env-filter"] }
+tracing-subscriber = { version = "0.3.18", features= ["env-filter"] }
 dotenv = "0.15.0"
 thiserror = "1.0.40"
 prometheus = "0.13.4"
