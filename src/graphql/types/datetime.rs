@@ -1,5 +1,5 @@
 use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value};
-use chrono::NaiveDateTime;
+use chrono::{DateTime as ChronoDateTime, NaiveDateTime};
 use core::str::FromStr;
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 
@@ -34,6 +34,10 @@ impl TryGetable for DateTime {
 
 impl Default for DateTime {
     fn default() -> Self {
-        DateTime(NaiveDateTime::from_timestamp_millis(0).unwrap())
+        DateTime(
+            ChronoDateTime::from_timestamp_millis(0)
+                .unwrap()
+                .naive_utc(),
+        )
     }
 }
