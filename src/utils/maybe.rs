@@ -1,6 +1,6 @@
 use async_graphql::{
-    async_trait::async_trait, parser::types::Field, registry::Registry, ContextSelectionSet,
-    OutputType, Positioned, ServerResult, Value,
+    parser::types::Field, registry::Registry, ContextSelectionSet, OutputType, Positioned,
+    ServerResult, Value,
 };
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 use std::{borrow::Cow, ops::Deref};
@@ -26,7 +26,6 @@ impl<T: TryGetable + Default> TryGetable for Maybe<T> {
     }
 }
 
-#[async_trait]
 impl<T: OutputType + Sync + Default> OutputType for Maybe<T> {
     fn type_name() -> Cow<'static, str> {
         T::type_name()
