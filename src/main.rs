@@ -5,7 +5,7 @@ mod http;
 mod utils;
 
 use crate::{graphql::create_schema, utils::SignalHandler};
-use axum::{Router, ServiceExt};
+use axum::Router;
 use graphql::Schema;
 use prometheus::{IntCounterVec, Opts, Registry};
 use sea_orm::DatabaseConnection;
@@ -15,7 +15,7 @@ use std::{
 };
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
-use tower_http::{cors::CorsLayer, normalize_path::NormalizePath, ServiceBuilderExt};
+use tower_http::{cors::CorsLayer, ServiceBuilderExt};
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Layer};
 
@@ -35,6 +35,7 @@ fn middlewares(router: Router) -> Router {
         .compression()
         .decompression()
         .layer(CorsLayer::permissive())
+        .trim_trailing_slash()
         .into_inner();
 
     router.layer(middlewares)
@@ -81,13 +82,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let app = http::routes().with_state(state);
     let app = middlewares(app);
-    let app = NormalizePath::trim_trailing_slash(app);
 
     let listener = TcpListener::bind(SOCKET_ADDR).await?;
 
-    axum::Server::from_tcp(listener.into_std()?)
-        .expect("failed to start server")
-        .serve(app.into_make_service())
+    axum::serve(listener, app)
         .with_graceful_shutdown(SignalHandler::new())
         .await?;
 
