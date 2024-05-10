@@ -53,7 +53,6 @@ const SOCKET_ADDR: SocketAddr = SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    dotenv::dotenv().ok();
     init_logger();
 
     let counter = IntCounterVec::new(
