@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.28.0", features = ["rt-multi-thread", "macros", "signal", "fs"] }
-async-graphql = { version = "7.0.5", features = ["chrono", "apollo_persisted_queries"] }
+async-graphql = { version = "7.0.6", features = ["chrono", "apollo_persisted_queries"] }
 async-graphql-parser = "7.0.5"
 async-graphql-axum = "7.0.5"
 chrono = { version = "0.4.24", default-features=false }
