@@ -9,7 +9,7 @@ async-graphql = { version = "7.0.5", features = ["chrono", "apollo_persisted_que
 async-graphql-parser = "7.0.5"
 async-graphql-axum = "7.0.5"
 chrono = { version = "0.4.24", default-features=false }
-sea-orm = { version = "0.12.5", features = ["sqlx-mysql", "runtime-actix-rustls", "macros", "with-chrono", "with-json" ], default-features = false }
+sea-orm = { version = "1.0.0", features = ["sqlx-mysql", "runtime-actix-rustls", "macros", "with-chrono", "with-json" ], default-features = false }
 sea-query = { version = "0.30.7", default-features = false, features = ["derive", "backend-mysql"] }
 redis = { version = "0.25.3", features = ["aio", "tokio-comp", "connection-manager"] }
 tracing = { version = "0.1.40", features = ["log"] }
