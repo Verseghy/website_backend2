@@ -13,4 +13,3 @@ pub use super::posts_authors::Entity as PostsAuthors;
 pub use super::posts_data::Entity as PostsData;
 pub use super::posts_labels::Entity as PostsLabels;
 pub use super::posts_pivot_labels_data::Entity as PostsPivotLabelsData;
-pub use super::users::Entity as Users;
