@@ -13,4 +13,3 @@ pub mod posts_authors;
 pub mod posts_data;
 pub mod posts_labels;
 pub mod posts_pivot_labels_data;
-pub mod users;
