@@ -44,7 +44,7 @@ impl Post {
     async fn index_image(&self) -> Result<String> {
         if let Some(ref image) = *self.index_image {
             Ok(format!(
-                "https://backend.verseghy-gimnazium.net/storage/posts_images/{}",
+                "https://backend.microshift.verseghy-gimnazium.net/storage/posts_images/{}",
                 image
             ))
         } else {
@@ -59,7 +59,7 @@ impl Post {
                 .filter(|elem| elem.is_string())
                 .map(|elem| {
                     format!(
-                        "https://backend.verseghy-gimnazium.net/storage/posts_images/{}",
+                        "https://backend.microshift.verseghy-gimnazium.net/storage/posts_images/{}",
                         elem.as_str().unwrap()
                     )
                 })
@@ -69,7 +69,7 @@ impl Post {
                 .filter(|elem| elem.is_string())
                 .map(|elem| {
                     format!(
-                        "https://backend.verseghy-gimnazium.net/storage/posts_images/{}",
+                        "https://backend.microshift.verseghy-gimnazium.net/storage/posts_images/{}",
                         elem.as_str().unwrap()
                     )
                 })

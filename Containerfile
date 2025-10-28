@@ -1,30 +1,36 @@
-FROM rust:alpine as builder
+FROM registry.access.redhat.com/ubi9/ubi as chef
 
-RUN apk add musl-dev
-RUN cargo new --bin /builder
+RUN curl --proto '=https' --tlsv1.3 -sSf https://sh.rustup.rs > rustup-init.sh && \
+    sh rustup-init.sh --default-toolchain "1.90" --profile minimal -y && \
+    source "$HOME/.bashrc" && \
+    dnf install clang -y
+
+ENV PATH="$PATH:/root/.cargo/bin"
+
+RUN cargo install cargo-chef --locked --version "0.1.67" && \
+    rm -rf $CARGO_HOME/registry/
+
+
+
+FROM chef AS planner
+WORKDIR /planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
+
+
+
+FROM chef AS builder
 WORKDIR /builder
-COPY ["Cargo.toml", "Cargo.lock", "./"]
-RUN cargo build --release && \
-    rm -rf ./src
-
-COPY src ./src
-RUN rm target/release/deps/website_backend2* && \
-    cargo build --release && \
-    strip -s target/release/website_backend2
+COPY --from=planner /planner/recipe.json recipe.json
+# Build dependencies
+RUN cargo chef cook --release --recipe-path recipe.json
+# Build application
+COPY . .
+RUN cargo build --release
 
 
 
-
-FROM alpine
-
+FROM registry.access.redhat.com/ubi9/ubi-micro
 WORKDIR /app
 COPY --from=builder /builder/target/release/website_backend2 ./
-EXPOSE 3000
-
-RUN addgroup -S backend2 && \
-    adduser -S -D -H -s /bin/false -G backend2 backend2 && \
-    chown -R backend2:backend2 /app
-USER backend2
-
 CMD ["./website_backend2"]
-

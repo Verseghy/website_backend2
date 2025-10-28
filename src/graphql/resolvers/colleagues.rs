@@ -31,7 +31,7 @@ impl Colleague {
     async fn image(&self) -> Result<Option<String>> {
         if let Some(Some(ref image)) = *self.image {
             Ok(Some(format!(
-                "https://backend.verseghy-gimnazium.net/storage/colleagues_images/{}",
+                "https://backend.microshift.verseghy-gimnazium.net/storage/colleagues_images/{}",
                 image
             )))
         } else {
