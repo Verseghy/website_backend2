@@ -32,7 +32,7 @@ impl Author {
         if let Some(ref image) = *self.image {
             if let Some(ref image) = image {
                 Ok(Some(format!(
-                    "https://backend.verseghy-gimnazium.net/storage/authors_images/{}",
+                    "https://backend.microshift.verseghy-gimnazium.net/storage/authors_images/{}",
                     image
                 )))
             } else {
