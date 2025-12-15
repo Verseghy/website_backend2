@@ -20,5 +20,5 @@ bincode = { version = "2.0.1", features = ["serde"] }
 serde_json = { version = "1.0.145", features = ["preserve_order"] }
 axum = { version = "0.8.7", features = ["http2", "tokio"], default-features = false }
 smallvec = "1.15.1"
-tower-http = { version = "0.6.6", features = ["cors", "compression-full", "decompression-full", "util", "catch-panic", "normalize-path"] }
+tower-http = { version = "0.6.8", features = ["cors", "compression-full", "decompression-full", "util", "catch-panic", "normalize-path"] }
 tower = "0.5.2"
