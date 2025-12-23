@@ -16,7 +16,6 @@ tracing = { version = "0.1.41", features = ["log"] }
 tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
 thiserror = "2.0.17"
 prometheus = "0.14.0"
-bincode = { version = "2.0.1", features = ["serde"] }
 serde_json = { version = "1.0.145", features = ["preserve_order"] }
 axum = { version = "0.8.6", features = ["http2", "tokio"], default-features = false }
 smallvec = "1.15.1"
