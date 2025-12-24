@@ -25,8 +25,9 @@ impl CacheStorage for RedisCache {
         let mut conn = self.manager.clone();
 
         let res: Vec<u8> = conn.get(&key).await.ok()?;
-        match bincode::serde::decode_from_slice(&res, bincode::config::standard()) {
-            Ok((document, _)) => document,
+
+        match serde_json::from_slice(&res) {
+            Ok(document) => document,
             Err(_) => {
                 let _: RedisResult<()> = conn.del(&key).await;
                 None
@@ -37,10 +38,11 @@ impl CacheStorage for RedisCache {
     async fn set(&self, key: String, document: ExecutableDocument) {
         let mut conn = self.manager.clone();
 
-        if let Ok(data) = bincode::serde::encode_to_vec(&document, bincode::config::standard()) {
-            let _: RedisResult<()> = conn.set(key, &data).await;
-        } else {
-            tracing::warn!("cache: failed to serialize ExecutableDocument")
-        }
+        let Ok(data) = serde_json::to_vec(&document) else {
+            tracing::warn!("cache: failed to serialize ExecutableDocument");
+            return;
+        };
+
+        let _: RedisResult<()> = conn.set(key, &data).await;
     }
 }
