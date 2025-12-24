@@ -3,13 +3,13 @@ use crate::entity::{
     pages,
 };
 use crate::select_columns;
-use crate::utils::{db_error, Maybe};
+use crate::utils::{Maybe, db_error};
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
-use prometheus::{labels, IntCounterVec};
+use prometheus::{IntCounterVec, labels};
 use sea_orm::{
+    DatabaseTransaction, FromQueryResult, Order,
     entity::prelude::*,
     query::{QueryOrder, QuerySelect},
-    DatabaseTransaction, FromQueryResult, Order,
 };
 use std::{ops::Deref, sync::Arc};
 

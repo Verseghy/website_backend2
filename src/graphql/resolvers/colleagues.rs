@@ -1,14 +1,14 @@
 use crate::{
     entity::colleagues_data::{Column, Entity as ColleaguesData},
     select_columns,
-    utils::{db_error, Maybe},
+    utils::{Maybe, db_error},
 };
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
-use prometheus::{labels, IntCounterVec};
+use prometheus::{IntCounterVec, labels};
 use sea_orm::{
+    DatabaseTransaction, FromQueryResult,
     prelude::*,
     query::{QueryOrder, QuerySelect},
-    DatabaseTransaction, FromQueryResult,
 };
 use std::{ops::Deref, sync::Arc};
 

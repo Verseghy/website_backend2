@@ -7,14 +7,14 @@ use crate::{
     },
     graphql::types::PostCursor,
     select_columns,
-    utils::{create_paginated_posts, db_error, Maybe},
+    utils::{Maybe, create_paginated_posts, db_error},
 };
 use async_graphql::{
-    connection::{Connection, EmptyFields},
     ComplexObject, Context, Object, Result, SimpleObject,
+    connection::{Connection, EmptyFields},
 };
-use prometheus::{labels, IntCounterVec};
-use sea_orm::{prelude::*, query::QuerySelect, Condition, DatabaseTransaction, FromQueryResult};
+use prometheus::{IntCounterVec, labels};
+use sea_orm::{Condition, DatabaseTransaction, FromQueryResult, prelude::*, query::QuerySelect};
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]

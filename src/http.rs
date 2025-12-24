@@ -1,15 +1,15 @@
 use crate::AppState;
 use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
     Response, ServerError,
+    http::{GraphQLPlaygroundConfig, playground_source},
 };
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
+    Router,
     extract::State,
     http::StatusCode,
     response::Html,
     routing::{get, post},
-    Router,
 };
 use prometheus::TextEncoder;
 use sea_orm::TransactionTrait;

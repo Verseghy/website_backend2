@@ -26,16 +26,14 @@ impl PostCursor {
 impl CursorType for PostCursor {
     type Error = PostCursorError;
     fn decode_cursor(s: &str) -> Result<Self, Self::Error> {
-        let split = s.split_once('#');
+        let Some((date, id)) = s.split_once('#') else {
+            return Err(PostCursorError::WrongFormat);
+        };
 
-        if let Some((date, id)) = split {
-            Ok(Self {
-                date: Date(NaiveDate::parse_from_str(date, DATE_FORMAT)?),
-                id: id.parse()?,
-            })
-        } else {
-            Err(PostCursorError::WrongFormat)
-        }
+        Ok(Self {
+            date: Date(NaiveDate::parse_from_str(date, DATE_FORMAT)?),
+            id: id.parse()?,
+        })
     }
 
     fn encode_cursor(&self) -> String {

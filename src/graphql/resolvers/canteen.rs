@@ -11,11 +11,11 @@ use crate::{
 };
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
 use chrono::{NaiveDate, Weekday};
-use prometheus::{labels, IntCounterVec};
+use prometheus::{IntCounterVec, labels};
 use sea_orm::{
+    DatabaseTransaction, FromQueryResult, JoinType,
     entity::prelude::*,
     query::{Order, QueryOrder, QuerySelect},
-    DatabaseTransaction, FromQueryResult, JoinType,
 };
 use std::{ops::Deref, sync::Arc};
 

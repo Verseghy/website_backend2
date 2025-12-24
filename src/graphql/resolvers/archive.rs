@@ -6,12 +6,12 @@ use crate::{
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
 use chrono::NaiveDate;
-use prometheus::{labels, IntCounterVec};
+use prometheus::{IntCounterVec, labels};
 use sea_orm::{
+    DatabaseTransaction, FromQueryResult,
     entity::prelude::*,
     query::{Order, QueryOrder, QuerySelect},
     sea_query::Expr,
-    DatabaseTransaction, FromQueryResult,
 };
 use std::{ops::Deref, sync::Arc};
 

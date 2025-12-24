@@ -15,9 +15,9 @@ use std::{
 };
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
-use tower_http::{cors::CorsLayer, ServiceBuilderExt};
+use tower_http::{ServiceBuilderExt, cors::CorsLayer};
 use tracing::level_filters::LevelFilter;
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Layer};
+use tracing_subscriber::{EnvFilter, Layer, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 fn init_logger() {
     let env_filter = EnvFilter::builder()

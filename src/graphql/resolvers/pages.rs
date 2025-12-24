@@ -1,9 +1,9 @@
 use crate::entity::pages::{Column, Entity as Pages};
 use crate::select_columns;
-use crate::utils::{db_error, Maybe};
+use crate::utils::{Maybe, db_error};
 use async_graphql::{Context, Object, Result, SimpleObject};
-use prometheus::{labels, IntCounterVec};
-use sea_orm::{entity::prelude::*, query::QuerySelect, DatabaseTransaction, FromQueryResult};
+use prometheus::{IntCounterVec, labels};
+use sea_orm::{DatabaseTransaction, FromQueryResult, entity::prelude::*, query::QuerySelect};
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
