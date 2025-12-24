@@ -16,6 +16,7 @@ allow = [
     "BSD-2-Clause",
     "Zlib",
     "Unicode-3.0",
+    "BSL-1.0",
 ]
 exceptions = [
     { allow = ["CDLA-Permissive-2.0"], crate = "webpki-roots" },
