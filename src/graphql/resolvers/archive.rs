@@ -10,9 +10,9 @@ use prometheus::{labels, IntCounterVec};
 use sea_orm::{
     entity::prelude::*,
     query::{Order, QueryOrder, QuerySelect},
+    sea_query::Expr,
     DatabaseTransaction, FromQueryResult,
 };
-use sea_query::Expr;
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
