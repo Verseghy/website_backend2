@@ -12,9 +12,9 @@ use chrono::NaiveDate;
 use sea_orm::{
     entity::{EntityTrait, RelationDef},
     query::{Order, QueryFilter, QueryOrder, QuerySelect},
+    sea_query::IntoCondition,
     ColumnTrait, DatabaseTransaction, DeriveColumn, EnumIter, JoinType, Select,
 };
-use sea_query::query::IntoCondition;
 
 fn build_paginated_posts(
     after: Option<PostCursor>,
