@@ -1,6 +1,6 @@
 use async_graphql::{async_trait::async_trait, extensions::apollo_persisted_queries::CacheStorage};
 use async_graphql_parser::types::ExecutableDocument;
-use redis::{aio::ConnectionManager, AsyncCommands, RedisResult};
+use redis::{AsyncCommands, RedisResult, aio::ConnectionManager};
 
 #[derive(Clone)]
 pub struct RedisCache {

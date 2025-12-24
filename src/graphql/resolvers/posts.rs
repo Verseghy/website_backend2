@@ -8,17 +8,17 @@ use crate::{
     },
     graphql::types::{Date, PostCursor},
     select_columns,
-    utils::{create_paginated_posts, db_error, Maybe},
+    utils::{Maybe, create_paginated_posts, db_error},
 };
 use async_graphql::{
-    connection::{Connection, EmptyFields},
     ComplexObject, Context, Error, Object, Result, SimpleObject,
+    connection::{Connection, EmptyFields},
 };
-use prometheus::{labels, IntCounterVec};
+use prometheus::{IntCounterVec, labels};
 use sea_orm::{
+    Condition, DatabaseTransaction, FromQueryResult,
     prelude::*,
     query::{JoinType, Order, QueryOrder, QuerySelect},
-    Condition, DatabaseTransaction, FromQueryResult,
 };
 use std::{ops::Deref, sync::Arc};
 

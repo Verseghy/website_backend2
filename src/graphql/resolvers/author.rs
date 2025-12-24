@@ -6,14 +6,14 @@ use crate::{
     },
     graphql::types::PostCursor,
     select_columns,
-    utils::{create_paginated_posts, db_error, Maybe},
+    utils::{Maybe, create_paginated_posts, db_error},
 };
 use async_graphql::{
-    connection::{Connection, EmptyFields},
     ComplexObject, Context, Error, Object, Result, SimpleObject,
+    connection::{Connection, EmptyFields},
 };
-use prometheus::{labels, IntCounterVec};
-use sea_orm::{prelude::*, query::QuerySelect, Condition, DatabaseTransaction, FromQueryResult};
+use prometheus::{IntCounterVec, labels};
+use sea_orm::{Condition, DatabaseTransaction, FromQueryResult, prelude::*, query::QuerySelect};
 use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
@@ -29,17 +29,17 @@ pub struct Author {
 #[ComplexObject]
 impl Author {
     async fn image(&self) -> Result<Option<String>> {
-        if let Some(ref image) = *self.image {
-            if let Some(ref image) = image {
-                Ok(Some(format!(
-                    "https://backend.microshift.verseghy-gimnazium.net/storage/authors_images/{}",
-                    image
-                )))
-            } else {
-                Ok(None)
-            }
+        let Some(ref image) = *self.image else {
+            return Err(Error::new("Database error: image not selected"));
+        };
+
+        if let Some(image) = image {
+            Ok(Some(format!(
+                "https://backend.microshift.verseghy-gimnazium.net/storage/authors_images/{}",
+                image
+            )))
         } else {
-            Err(Error::new("Database error: image not selected"))
+            Ok(None)
         }
     }
 

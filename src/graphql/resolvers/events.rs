@@ -2,15 +2,15 @@ use crate::{
     entity::events_data::{Column, Entity as EventsData},
     graphql::types::DateTime,
     select_columns,
-    utils::{db_error, Maybe},
+    utils::{Maybe, db_error},
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
 use chrono::{Datelike, Duration, NaiveDate};
-use prometheus::{labels, IntCounterVec};
+use prometheus::{IntCounterVec, labels};
 use sea_orm::{
+    DatabaseTransaction, FromQueryResult,
     prelude::*,
     query::{Order, QueryOrder, QuerySelect},
-    DatabaseTransaction, FromQueryResult,
 };
 use std::{ops::Deref, sync::Arc};
 

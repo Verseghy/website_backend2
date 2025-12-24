@@ -3,8 +3,8 @@ pub mod resolvers;
 pub mod types;
 
 use async_graphql::{
-    extensions::{apollo_persisted_queries::ApolloPersistedQueries, Analyzer},
     EmptyMutation, EmptySubscription, MergedObject,
+    extensions::{Analyzer, apollo_persisted_queries::ApolloPersistedQueries},
 };
 use cache::RedisCache;
 use resolvers::{

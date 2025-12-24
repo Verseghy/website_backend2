@@ -1,6 +1,6 @@
 use async_graphql::{
-    parser::types::Field, registry::Registry, ContextSelectionSet, OutputType, Positioned,
-    ServerResult, Value,
+    ContextSelectionSet, OutputType, Positioned, ServerResult, Value, parser::types::Field,
+    registry::Registry,
 };
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 use std::{borrow::Cow, ops::Deref};
