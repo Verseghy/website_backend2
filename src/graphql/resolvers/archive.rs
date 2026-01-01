@@ -17,9 +17,9 @@ use std::{ops::Deref, sync::Arc};
 
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Info {
-    count: i32,
-    year: i32,
-    month: i32,
+    count: i64,
+    year: u32,
+    month: u32,
 }
 
 #[derive(Debug)]

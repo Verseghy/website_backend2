@@ -6,9 +6,9 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "posts_pivot_labels_data")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub labels_id: i32,
+    pub labels_id: u32,
     #[sea_orm(primary_key, auto_increment = false)]
-    pub posts_id: i32,
+    pub posts_id: u32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
