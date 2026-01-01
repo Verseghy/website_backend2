@@ -6,9 +6,9 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "canteen_pivot_menus_data")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub data_id: i32,
+    pub data_id: u32,
     #[sea_orm(primary_key, auto_increment = false)]
-    pub menu_id: i32,
+    pub menu_id: u32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
