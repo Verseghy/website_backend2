@@ -35,15 +35,15 @@ fn build_paginated_posts(
 
     if let Some(after) = after {
         query = query
-            .filter(Column::Date.gte(after.date()))
-            .filter(Column::Id.gt(after.id()));
+            .filter(Column::Date.lte(after.date()))
+            .filter(Column::Id.lt(after.id()));
     }
 
     if let Some(first) = first {
         query = query
             .limit(first as u64)
-            .order_by(Column::Date, Order::Asc)
-            .order_by(Column::Id, Order::Asc);
+            .order_by(Column::Date, Order::Desc)
+            .order_by(Column::Id, Order::Desc);
     }
 
     if let Some(last) = last {
