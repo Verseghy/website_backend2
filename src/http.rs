@@ -1,8 +1,5 @@
 use crate::AppState;
-use async_graphql::{
-    Response, ServerError,
-    http::{GraphQLPlaygroundConfig, playground_source},
-};
+use async_graphql::{Response, ServerError, http::GraphiQLSource};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     Router,
@@ -52,10 +49,8 @@ async fn graphql(State(state): State<AppState>, request: GraphQLRequest) -> Grap
     res.into()
 }
 
-async fn playground() -> Html<String> {
-    Html(playground_source(GraphQLPlaygroundConfig::new(
-        GRAPHQL_PATH,
-    )))
+async fn graphiql() -> Html<String> {
+    Html(GraphiQLSource::build().endpoint(GRAPHQL_PATH).finish())
 }
 
 async fn metrics(State(state): State<AppState>) -> Result<String, StatusCode> {
@@ -69,7 +64,7 @@ async fn metrics(State(state): State<AppState>) -> Result<String, StatusCode> {
 
 pub fn routes() -> Router<AppState> {
     Router::new()
-        .route(GRAPHQL_PATH, get(playground))
+        .route(GRAPHQL_PATH, get(graphiql))
         .route(GRAPHQL_PATH, post(graphql))
         .route("/metrics", get(metrics))
         .route("/readiness", get(|| async {}))
