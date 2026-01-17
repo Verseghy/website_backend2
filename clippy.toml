@@ -1,0 +1,4 @@
+disallowed-methods = [
+    { path = "std::env::var", reason = "Use crate::Config" },
+    { path = "std::env::var_os", reason = "Use crate::Config" },
+]
