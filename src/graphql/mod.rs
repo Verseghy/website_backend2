@@ -2,6 +2,7 @@ mod cache;
 pub mod resolvers;
 pub mod types;
 
+use crate::Config;
 use async_graphql::{
     EmptyMutation, EmptySubscription, MergedObject,
     extensions::{Analyzer, apollo_persisted_queries::ApolloPersistedQueries},
@@ -27,8 +28,8 @@ pub struct Query(
 
 pub type Schema = async_graphql::Schema<Query, EmptyMutation, EmptySubscription>;
 
-pub async fn create_schema() -> Schema {
-    let cache = RedisCache::new()
+pub async fn create_schema(config: &Config) -> Schema {
+    let cache = RedisCache::new(&config.redis_url)
         .await
         .expect("Could not create redis cache");
 

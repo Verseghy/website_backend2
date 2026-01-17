@@ -6,6 +6,7 @@ mod utils;
 
 use crate::{graphql::create_schema, utils::SignalHandler};
 use axum::Router;
+use envconfig::Envconfig;
 use graphql::Schema;
 use prometheus::{IntCounterVec, Opts, Registry};
 use sea_orm::DatabaseConnection;
@@ -18,6 +19,14 @@ use tower::ServiceBuilder;
 use tower_http::{ServiceBuilderExt, cors::CorsLayer};
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{EnvFilter, Layer, fmt, layer::SubscriberExt, util::SubscriberInitExt};
+
+#[derive(Debug, Clone, Envconfig)]
+struct Config {
+    #[envconfig(from = "DATABASE_URL")]
+    pub database_url: String,
+    #[envconfig(from = "REDIS_URL")]
+    pub redis_url: String,
+}
 
 fn init_logger() {
     let env_filter = EnvFilter::builder()
@@ -55,6 +64,8 @@ const SOCKET_ADDR: SocketAddr = SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED
 async fn main() -> Result<(), Box<dyn Error>> {
     init_logger();
 
+    let config = Config::init_from_env()?;
+
     let counter = IntCounterVec::new(
         Opts::new("query_req_count", "count of resource queries"),
         &["resource"],
@@ -67,8 +78,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .register(Box::new(counter.clone()))
         .expect("Could not register counter to Prometheus registry");
 
-    let schema = create_schema().await;
-    let database = database::connect().await;
+    let schema = create_schema(&config).await;
+    let database = database::connect(&config.database_url).await;
 
     tracing::info!("Listening on port {}", SOCKET_ADDR.port());
 

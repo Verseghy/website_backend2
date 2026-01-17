@@ -8,9 +8,7 @@ pub struct RedisCache {
 }
 
 impl RedisCache {
-    pub async fn new() -> RedisResult<Self> {
-        let url =
-            std::env::var("REDIS_URL").expect("Could not find REDIS_URL environment variable");
+    pub async fn new(url: &str) -> RedisResult<Self> {
         let client = redis::Client::open(url)?;
 
         Ok(Self {
