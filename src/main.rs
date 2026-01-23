@@ -26,6 +26,8 @@ struct Config {
     pub database_url: String,
     #[envconfig(from = "REDIS_URL")]
     pub redis_url: String,
+    #[envconfig(from = "STORAGE_BASE_URL")]
+    pub storage_base_url: String,
 }
 
 fn init_logger() {
@@ -54,6 +56,7 @@ fn middlewares(router: Router) -> Router {
 struct AppState {
     pub schema: Schema,
     pub database: DatabaseConnection,
+    pub config: Config,
     pub counter: IntCounterVec,
     pub prometheus_registry: Registry,
 }
@@ -86,6 +89,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let state = AppState {
         schema,
         database,
+        config,
         counter,
         prometheus_registry,
     };

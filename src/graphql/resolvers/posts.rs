@@ -1,5 +1,6 @@
 use super::{Author, Label};
 use crate::{
+    Config,
     entity::{
         posts_authors::{self, Entity as PostsAuthors},
         posts_data::{self, Entity as PostsData},
@@ -41,25 +42,27 @@ pub struct Post {
 
 #[ComplexObject]
 impl Post {
-    async fn index_image(&self) -> Result<String> {
-        if let Some(ref image) = *self.index_image {
-            Ok(format!(
-                "https://backend.microshift.verseghy-gimnazium.net/storage/posts_images/{}",
-                image
-            ))
-        } else {
-            Err(Error::new("No index image found"))
-        }
+    async fn index_image(&self, ctx: &Context<'_>) -> Result<String> {
+        let config = ctx.data_unchecked::<Config>();
+
+        let Some(ref image) = *self.index_image else {
+            return Err(Error::new("No index image found"));
+        };
+
+        Ok(format!("{}/posts_images/{image}", config.storage_base_url))
     }
 
-    async fn images(&self) -> Result<Vec<String>> {
+    async fn images(&self, ctx: &Context<'_>) -> Result<Vec<String>> {
+        let config = ctx.data_unchecked::<Config>();
+
         match &*self.images {
             Some(Json::Array(arr)) => Ok(arr
                 .iter()
                 .filter(|elem| elem.is_string())
                 .map(|elem| {
                     format!(
-                        "https://backend.microshift.verseghy-gimnazium.net/storage/posts_images/{}",
+                        "{}/posts_images/{}",
+                        config.storage_base_url,
                         elem.as_str().unwrap()
                     )
                 })
@@ -69,7 +72,8 @@ impl Post {
                 .filter(|elem| elem.is_string())
                 .map(|elem| {
                     format!(
-                        "https://backend.microshift.verseghy-gimnazium.net/storage/posts_images/{}",
+                        "{}/posts_images/{}",
+                        config.storage_base_url,
                         elem.as_str().unwrap()
                     )
                 })

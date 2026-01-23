@@ -26,7 +26,12 @@ async fn graphql(State(state): State<AppState>, request: GraphQLRequest) -> Grap
             let tx = Arc::new(tx);
             let res = state
                 .schema
-                .execute(request.data(Arc::clone(&tx)).data(state.counter))
+                .execute(
+                    request
+                        .data(Arc::clone(&tx))
+                        .data(state.counter)
+                        .data(state.config),
+                )
                 .await;
 
             if let Err(err) = Arc::try_unwrap(tx).unwrap().commit().await {

@@ -1,4 +1,5 @@
 use crate::{
+    Config,
     entity::colleagues_data::{Column, Entity as ColleaguesData},
     select_columns,
     utils::{Maybe, db_error},
@@ -28,15 +29,17 @@ pub struct Colleague {
 
 #[ComplexObject]
 impl Colleague {
-    async fn image(&self) -> Result<Option<String>> {
-        if let Some(Some(ref image)) = *self.image {
-            Ok(Some(format!(
-                "https://backend.microshift.verseghy-gimnazium.net/storage/colleagues_images/{}",
-                image
-            )))
-        } else {
-            Ok(None)
-        }
+    async fn image(&self, ctx: &Context<'_>) -> Result<Option<String>> {
+        let config = ctx.data_unchecked::<Config>();
+
+        let Some(Some(ref image)) = *self.image else {
+            return Ok(None);
+        };
+
+        Ok(Some(format!(
+            "{}/colleagues_images/{}",
+            config.storage_base_url, image
+        )))
     }
 }
 

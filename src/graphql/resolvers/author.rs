@@ -1,5 +1,6 @@
 use super::Post;
 use crate::{
+    Config,
     entity::{
         posts_authors::{self, Entity as PostsAuthors},
         posts_data,
@@ -28,19 +29,21 @@ pub struct Author {
 
 #[ComplexObject]
 impl Author {
-    async fn image(&self) -> Result<Option<String>> {
+    async fn image(&self, ctx: &Context<'_>) -> Result<Option<String>> {
+        let config = ctx.data_unchecked::<Config>();
+
         let Some(ref image) = *self.image else {
             return Err(Error::new("Database error: image not selected"));
         };
 
-        if let Some(image) = image {
-            Ok(Some(format!(
-                "https://backend.microshift.verseghy-gimnazium.net/storage/authors_images/{}",
-                image
-            )))
-        } else {
-            Ok(None)
-        }
+        let Some(image) = image else {
+            return Ok(None);
+        };
+
+        Ok(Some(format!(
+            "{}/authors_images/{}",
+            config.storage_base_url, image
+        )))
     }
 
     async fn posts(
