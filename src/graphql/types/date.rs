@@ -3,6 +3,7 @@ use chrono::NaiveDate;
 use core::str::FromStr;
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 
+/// A date without time information. Format: YYYY-MM-DD (e.g., "2024-01-15").
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Date(pub NaiveDate);
 

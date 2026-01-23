@@ -15,19 +15,30 @@ use sea_orm::{
 };
 use std::{ops::Deref, sync::Arc};
 
+/// Summary information about posts in a specific month.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Info {
+    /// Number of posts in this month.
     count: i32,
+    /// Year.
     year: i32,
+    /// Month (1-12).
     month: i32,
 }
 
+/// Container for accessing archived posts by year and month.
 #[derive(Debug)]
 pub struct Archive;
 
 #[Object]
 impl Archive {
-    async fn posts(&self, ctx: &Context<'_>, year: i32, month: u32) -> Result<Vec<Post>> {
+    /// Retrieve posts from a specific year and month.
+    async fn posts(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(desc = "The year.")] year: i32,
+        #[graphql(desc = "The month (1-12).")] month: u32,
+    ) -> Result<Vec<Post>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsData::find().select_only();
 
@@ -61,6 +72,9 @@ impl Archive {
             .map_err(db_error)
     }
 
+    /// Get a summary of post counts grouped by year and month.
+    ///
+    /// Returns entries sorted by date in descending order (newest first).
     async fn info(&self, ctx: &Context<'_>) -> Result<Vec<Info>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
 
@@ -93,6 +107,10 @@ pub struct ArchiveQuery;
 
 #[Object]
 impl ArchiveQuery {
+    /// Access the post archive.
+    ///
+    /// Use `posts(year, month)` to retrieve posts from a specific month,
+    /// or `info` to get a summary of all available months.
     async fn archive(&self, ctx: &Context<'_>) -> Result<Archive> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "archive"})

@@ -14,13 +14,20 @@ use sea_orm::{
 };
 use std::{ops::Deref, sync::Arc};
 
+/// A calendar event.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Event {
+    /// Unique identifier.
     id: Maybe<u32>,
+    /// Event start date and time.
     date_from: Maybe<DateTime>,
+    /// Event end date and time.
     date_to: Maybe<DateTime>,
+    /// Event title.
     title: Maybe<String>,
+    /// Event description.
     description: Maybe<Option<String>>,
+    /// Display color for the event.
     color: Maybe<Option<String>>,
 }
 
@@ -29,7 +36,16 @@ pub struct EventsQuery;
 
 #[Object]
 impl EventsQuery {
-    async fn events(&self, ctx: &Context<'_>, year: i32, month: u32) -> Result<Vec<Event>> {
+    /// Retrieve events for a specific month.
+    ///
+    /// Returns events that overlap with the calendar view of the specified month
+    /// (including days from adjacent weeks that appear in the month's calendar grid).
+    async fn events(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(desc = "The year.")] year: i32,
+        #[graphql(desc = "The month (1-12).")] month: u32,
+    ) -> Result<Vec<Event>> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "events"})
             .inc();

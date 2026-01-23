@@ -23,13 +23,19 @@ use sea_orm::{
 };
 use std::{ops::Deref, sync::Arc};
 
+/// A blog post or article.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
 pub struct Post {
+    /// Unique identifier.
     pub id: Maybe<u32>,
+    /// Post title.
     pub title: Maybe<String>,
+    /// Theme color for display.
     pub color: Maybe<String>,
+    /// Short description or excerpt.
     pub description: Maybe<Option<String>>,
+    /// Full post content.
     pub content: Maybe<String>,
     #[graphql(skip)]
     pub index_image: Maybe<String>,
@@ -37,11 +43,13 @@ pub struct Post {
     pub author_id: Maybe<u32>,
     #[graphql(skip)]
     pub images: Maybe<serde_json::Value>,
+    /// Publication date.
     pub date: Maybe<Date>,
 }
 
 #[ComplexObject]
 impl Post {
+    /// Main image URL for the post.
     async fn index_image(&self, ctx: &Context<'_>) -> Result<String> {
         let config = ctx.data_unchecked::<Config>();
 
@@ -52,6 +60,7 @@ impl Post {
         Ok(format!("{}/posts_images/{image}", config.storage_base_url))
     }
 
+    /// Additional image URLs associated with the post.
     async fn images(&self, ctx: &Context<'_>) -> Result<Vec<String>> {
         let config = ctx.data_unchecked::<Config>();
 
@@ -82,6 +91,7 @@ impl Post {
         }
     }
 
+    /// The author of this post.
     async fn author(&self, ctx: &Context<'_>) -> Result<Option<Author>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsAuthors::find().select_only();
@@ -97,6 +107,7 @@ impl Post {
             .map_err(db_error)
     }
 
+    /// Labels/categories associated with this post.
     async fn labels(&self, ctx: &Context<'_>) -> Result<Vec<Label>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = PostsLabels::find().select_only();
@@ -123,6 +134,10 @@ pub struct PostsQuery;
 
 #[Object]
 impl PostsQuery {
+    /// Retrieve a paginated list of published posts.
+    ///
+    /// Use `featured: true` to filter only featured posts.
+    /// Supports cursor-based pagination with `after`, `before`, `first`, and `last` arguments.
     async fn posts(
         &self,
         ctx: &Context<'_>,
@@ -150,9 +165,13 @@ impl PostsQuery {
         create_paginated_posts(after, before, first, last, ctx, db, condition, None).await
     }
 
+    /// Search posts by title, description, or content.
+    ///
+    /// Returns a paginated list of posts matching the search term.
     async fn search(
         &self,
         ctx: &Context<'_>,
+        #[graphql(desc = "The search term to match against post title, description, and content.")]
         term: String,
         after: Option<String>,
         before: Option<String>,
@@ -172,11 +191,15 @@ impl PostsQuery {
         create_paginated_posts(after, before, first, last, ctx, db, condition, None).await
     }
 
+    /// Retrieve a single post by ID.
+    ///
+    /// For published posts, only the `id` is required.
+    /// For unpublished posts, a valid `token` (preview token) must be provided.
     async fn post(
         &self,
         ctx: &Context<'_>,
-        id: u32,
-        token: Option<String>,
+        #[graphql(desc = "The post ID.")] id: u32,
+        #[graphql(desc = "Preview token for accessing unpublished posts.")] token: Option<String>,
     ) -> Result<Option<Post>> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "post"})

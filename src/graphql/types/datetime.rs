@@ -3,21 +3,23 @@ use chrono::{DateTime as ChronoDateTime, NaiveDateTime};
 use core::str::FromStr;
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 
+/// A date with time information. Format: YYYY-MM-DD HH:MM:SS (e.g., "2024-01-15 14:30:00").
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct DateTime(pub NaiveDateTime);
 
 #[Scalar]
 impl ScalarType for DateTime {
     fn parse(value: Value) -> InputValueResult<DateTime> {
-        if let Value::String(value) = value {
-            let date = NaiveDateTime::from_str(&value);
-            if let Ok(date) = date {
-                Ok(DateTime(date))
-            } else {
-                Err(InputValueError::custom("Wrong date format"))
-            }
+        let Value::String(value) = value else {
+            return Err(InputValueError::expected_type(value));
+        };
+
+        let date = NaiveDateTime::from_str(&value);
+
+        if let Ok(date) = date {
+            Ok(DateTime(date))
         } else {
-            Err(InputValueError::expected_type(value))
+            Err(InputValueError::custom("Wrong date format"))
         }
     }
 

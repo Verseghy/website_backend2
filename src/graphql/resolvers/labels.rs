@@ -17,20 +17,27 @@ use prometheus::{IntCounterVec, labels};
 use sea_orm::{Condition, DatabaseTransaction, FromQueryResult, prelude::*, query::QuerySelect};
 use std::{ops::Deref, sync::Arc};
 
+/// A category label for posts.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
 pub struct Label {
+    /// Unique identifier.
     pub id: Maybe<u32>,
+    /// Label name.
     pub name: Maybe<String>,
+    /// Display color (hex or named color).
     pub color: Maybe<String>,
 }
 
 #[ComplexObject]
 impl Label {
+    /// Paginated list of posts with this label.
+    ///
+    /// Use `featured: true` to filter only featured posts.
     async fn posts(
         &self,
         ctx: &Context<'_>,
-        #[graphql(default = false)] featured: bool,
+        #[graphql(default = false, desc = "Filter to only featured posts.")] featured: bool,
         after: Option<String>,
         before: Option<String>,
         first: Option<i32>,
@@ -69,7 +76,12 @@ pub struct LabelQuery;
 
 #[Object]
 impl LabelQuery {
-    pub async fn label(&self, ctx: &Context<'_>, id: u32) -> Result<Option<Label>> {
+    /// Retrieve a label by its ID.
+    pub async fn label(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(desc = "The label's unique identifier.")] id: u32,
+    ) -> Result<Option<Label>> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "label"})
             .inc();

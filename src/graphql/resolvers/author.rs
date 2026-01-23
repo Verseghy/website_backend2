@@ -17,11 +17,15 @@ use prometheus::{IntCounterVec, labels};
 use sea_orm::{Condition, DatabaseTransaction, FromQueryResult, prelude::*, query::QuerySelect};
 use std::{ops::Deref, sync::Arc};
 
+/// A post author.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
 pub struct Author {
+    /// Unique identifier.
     pub id: Maybe<u32>,
+    /// Author's full name.
     pub name: Maybe<String>,
+    /// Author biography or description.
     pub description: Maybe<Option<String>>,
     #[graphql(skip)]
     pub image: Maybe<Option<String>>,
@@ -29,6 +33,7 @@ pub struct Author {
 
 #[ComplexObject]
 impl Author {
+    /// Profile image URL.
     async fn image(&self, ctx: &Context<'_>) -> Result<Option<String>> {
         let config = ctx.data_unchecked::<Config>();
 
@@ -46,10 +51,13 @@ impl Author {
         )))
     }
 
+    /// Paginated list of posts written by this author.
+    ///
+    /// Use `featured: true` to filter only featured posts.
     async fn posts(
         &self,
         ctx: &Context<'_>,
-        #[graphql(default = false)] featured: bool,
+        #[graphql(default = false, desc = "Filter to only featured posts.")] featured: bool,
         after: Option<String>,
         before: Option<String>,
         first: Option<i32>,
@@ -77,7 +85,12 @@ pub struct AuthorsQuery;
 
 #[Object]
 impl AuthorsQuery {
-    pub async fn author(&self, ctx: &Context<'_>, id: u32) -> Result<Option<Author>> {
+    /// Retrieve an author by their ID.
+    pub async fn author(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(desc = "The author's unique identifier.")] id: u32,
+    ) -> Result<Option<Author>> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "author"})
             .inc();

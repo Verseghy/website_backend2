@@ -13,13 +13,17 @@ use sea_orm::{
 };
 use std::{ops::Deref, sync::Arc};
 
+/// A navigation menu item.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
 pub struct MenuItem {
     #[graphql(skip)]
     id: Maybe<u32>,
+    /// Display name of the menu item.
     name: Maybe<String>,
+    /// Item type (e.g., "page", "link", "separator").
     r#type: Maybe<String>,
+    /// External URL for link-type items.
     link: Maybe<Option<String>>,
     #[graphql(skip)]
     page_id: Option<u32>,
@@ -32,6 +36,7 @@ enum QuerySlug {
 
 #[ComplexObject]
 impl MenuItem {
+    /// Page slug for page-type items (used to construct internal links).
     async fn slug(&self, ctx: &Context<'_>) -> Result<Option<String>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         Ok(pages::Entity::find()
@@ -45,6 +50,7 @@ impl MenuItem {
             .map(|(slug,)| slug))
     }
 
+    /// Nested child menu items (for dropdown menus).
     async fn children(&self, ctx: &Context<'_>) -> Result<Vec<MenuItem>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = MenuItems::find().select_only();
@@ -70,6 +76,9 @@ pub struct MenuQuery;
 
 #[Object]
 impl MenuQuery {
+    /// Retrieve the navigation menu structure.
+    ///
+    /// Returns top-level menu items. Use the `children` field to access nested items.
     async fn menu(&self, ctx: &Context<'_>) -> Result<Vec<MenuItem>> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "menu"})
