@@ -12,7 +12,7 @@ use prometheus::{IntCounterVec, Opts, Registry};
 use sea_orm::DatabaseConnection;
 use std::{
     error::Error,
-    net::{IpAddr, Ipv6Addr, SocketAddr},
+    net::{IpAddr, SocketAddr},
 };
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
@@ -22,6 +22,10 @@ use tracing_subscriber::{EnvFilter, Layer, fmt, layer::SubscriberExt, util::Subs
 
 #[derive(Debug, Clone, Envconfig)]
 struct Config {
+    #[envconfig(from = "BIND_ADDR", default = "::1")]
+    pub bind_addr: IpAddr,
+    #[envconfig(from = "BIND_PORT", default = "3000")]
+    pub bind_port: u16,
     #[envconfig(from = "DATABASE_URL")]
     pub database_url: String,
     #[envconfig(from = "REDIS_URL")]
@@ -61,8 +65,6 @@ struct AppState {
     pub prometheus_registry: Registry,
 }
 
-const SOCKET_ADDR: SocketAddr = SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), 3000);
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     init_logger();
@@ -84,7 +86,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let schema = create_schema(&config).await;
     let database = database::connect(&config.database_url).await;
 
-    tracing::info!("Listening on port {}", SOCKET_ADDR.port());
+    let socket_addr = SocketAddr::new(config.bind_addr, config.bind_port);
 
     let state = AppState {
         schema,
@@ -97,7 +99,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let app = http::routes().with_state(state);
     let app = middlewares(app);
 
-    let listener = TcpListener::bind(SOCKET_ADDR).await?;
+    let listener = TcpListener::bind(socket_addr).await?;
+
+    tracing::info!("Listening on port {}", socket_addr.port());
 
     axum::serve(listener, app)
         .with_graceful_shutdown(SignalHandler::new())
