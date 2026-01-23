@@ -19,22 +19,30 @@ use sea_orm::{
 };
 use std::{ops::Deref, sync::Arc};
 
+/// A canteen menu item.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Menu {
+    /// Unique identifier.
     id: Maybe<u32>,
+    /// Menu item description.
     menu: Maybe<String>,
+    /// Menu type identifier (e.g., main course, soup, dessert).
     r#type: Maybe<u16>,
 }
 
+/// A day's canteen information.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
 pub struct Canteen {
+    /// Unique identifier.
     id: Maybe<u32>,
+    /// The date for this canteen menu.
     date: Maybe<Date>,
 }
 
 #[ComplexObject]
 impl Canteen {
+    /// Available menu items for this day.
     async fn menus(&self, ctx: &Context<'_>) -> Result<Vec<Menu>> {
         let db = ctx.data::<Arc<DatabaseTransaction>>().unwrap();
         let mut query = CanteenMenus::find().select_only();
@@ -60,7 +68,15 @@ pub struct CanteenQuery;
 
 #[Object]
 impl CanteenQuery {
-    async fn canteen(&self, ctx: &Context<'_>, year: i32, week: i32) -> Result<Vec<Canteen>> {
+    /// Retrieve canteen menus for a specific ISO week.
+    ///
+    /// Returns canteen data for each day of the specified week (Monday through Sunday).
+    async fn canteen(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(desc = "The ISO year.")] year: i32,
+        #[graphql(desc = "The ISO week number (1-53).")] week: i32,
+    ) -> Result<Vec<Canteen>> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "canteen"})
             .inc();

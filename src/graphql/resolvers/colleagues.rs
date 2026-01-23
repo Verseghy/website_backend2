@@ -13,22 +13,31 @@ use sea_orm::{
 };
 use std::{ops::Deref, sync::Arc};
 
+/// A staff member or colleague.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 #[graphql(complex)]
 pub struct Colleague {
+    /// Unique identifier.
     pub id: Maybe<u32>,
+    /// Full name (may include title like "Dr.").
     pub name: Maybe<String>,
+    /// Job titles or positions.
     pub jobs: Maybe<Option<String>>,
+    /// Teaching subjects.
     pub subjects: Maybe<Option<String>>,
+    /// Additional roles or responsibilities.
     pub roles: Maybe<Option<String>>,
+    /// Awards and recognitions.
     pub awards: Maybe<Option<String>>,
     #[graphql(skip)]
     pub image: Maybe<Option<String>>,
+    /// Category identifier for grouping colleagues.
     pub category: Maybe<u16>,
 }
 
 #[ComplexObject]
 impl Colleague {
+    /// Profile image URL.
     async fn image(&self, ctx: &Context<'_>) -> Result<Option<String>> {
         let config = ctx.data_unchecked::<Config>();
 
@@ -48,6 +57,9 @@ pub struct ColleaguesQuery;
 
 #[Object]
 impl ColleaguesQuery {
+    /// Retrieve all colleagues, sorted alphabetically by name.
+    ///
+    /// Names with "Dr." prefix are sorted by the name portion (ignoring the title).
     async fn colleagues(&self, ctx: &Context<'_>) -> Result<Vec<Colleague>> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "colleagues"})

@@ -6,13 +6,20 @@ use prometheus::{IntCounterVec, labels};
 use sea_orm::{DatabaseTransaction, FromQueryResult, entity::prelude::*, query::QuerySelect};
 use std::{ops::Deref, sync::Arc};
 
+/// A static page.
 #[derive(SimpleObject, Debug, FromQueryResult)]
 pub struct Page {
+    /// Unique identifier.
     id: Maybe<u32>,
+    /// Template name used to render this page.
     template: Maybe<String>,
+    /// Internal page name.
     name: Maybe<String>,
+    /// Page title for display.
     title: Maybe<String>,
+    /// Page content (HTML or markdown).
     content: Maybe<String>,
+    /// Additional structured data as JSON.
     extras: Maybe<Json>,
 }
 
@@ -21,7 +28,12 @@ pub struct PagesQuery;
 
 #[Object]
 impl PagesQuery {
-    async fn page(&self, ctx: &Context<'_>, slug: String) -> Result<Option<Page>> {
+    /// Retrieve a page by its URL slug.
+    async fn page(
+        &self,
+        ctx: &Context<'_>,
+        #[graphql(desc = "The page's URL slug (e.g., \"about\", \"contact\").")] slug: String,
+    ) -> Result<Option<Page>> {
         ctx.data_unchecked::<IntCounterVec>()
             .with(&labels! {"resource" => "page"})
             .inc();
