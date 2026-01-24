@@ -1,13 +1,13 @@
-use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value};
+use async_graphql::{Description, InputValueError, InputValueResult, Scalar, ScalarType, Value};
 use chrono::NaiveDate;
 use core::str::FromStr;
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 
 /// A date without time information. Format: YYYY-MM-DD (e.g., "2024-01-15").
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Description)]
 pub struct Date(pub NaiveDate);
 
-#[Scalar]
+#[Scalar(use_type_description)]
 impl ScalarType for Date {
     fn parse(value: Value) -> InputValueResult<Date> {
         if let Value::String(value) = value {

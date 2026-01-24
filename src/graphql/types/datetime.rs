@@ -1,13 +1,13 @@
-use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value};
+use async_graphql::{Description, InputValueError, InputValueResult, Scalar, ScalarType, Value};
 use chrono::{DateTime as ChronoDateTime, NaiveDateTime};
 use core::str::FromStr;
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 
 /// A date with time information. Format: YYYY-MM-DD HH:MM:SS (e.g., "2024-01-15 14:30:00").
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Description)]
 pub struct DateTime(pub NaiveDateTime);
 
-#[Scalar]
+#[Scalar(use_type_description)]
 impl ScalarType for DateTime {
     fn parse(value: Value) -> InputValueResult<DateTime> {
         let Value::String(value) = value else {
