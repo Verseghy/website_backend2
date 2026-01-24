@@ -22,7 +22,7 @@ use tracing_subscriber::{EnvFilter, Layer, fmt, layer::SubscriberExt, util::Subs
 
 #[derive(Debug, Clone, Envconfig)]
 struct Config {
-    #[envconfig(from = "BIND_ADDR", default = "::1")]
+    #[envconfig(from = "BIND_ADDR", default = "::")]
     pub bind_addr: IpAddr,
     #[envconfig(from = "BIND_PORT", default = "3000")]
     pub bind_port: u16,
