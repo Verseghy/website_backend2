@@ -147,7 +147,7 @@ where
                 .await
                 .map_err(db_error)?;
 
-            res.sort_by(|a, b| b.date.cmp(&a.date));
+            res.sort_by_key(|p| std::cmp::Reverse(p.date));
 
             let (min, max) = get_published_posts_min_max_id(db).await?;
 
