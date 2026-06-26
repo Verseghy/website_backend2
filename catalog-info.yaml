@@ -1,0 +1,31 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: website-backend2
+  title: Website Backend 2
+  description: Backend service (port 3000), MySQL + Redis backed, 3 replicas
+  annotations:
+    github.com/project-slug: Verseghy/website_backend2
+    argocd/instance-name: verseghy
+    argocd/app-selector: verseghy.net/component=backend2
+    janus-idp.io/tekton: website-backend2
+    backstage.io/kubernetes-namespace: verseghy
+    backstage.io/kubernetes-label-selector: 'pipelinesascode.tekton.dev/repository=website-backend2'
+    backstage.io/source-location: url:https://github.com/Verseghy/website_backend2/tree/master/
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - service
+    - ghcr
+  links:
+    - url: https://backend2.microshift.verseghy-gimnazium.net
+      title: Backend2 route
+spec:
+  type: service
+  lifecycle: production
+  owner: group:verseghy
+  system: verseghy-website
+  dependsOn:
+    - resource:mysql
+    - resource:backend2-redis
+  providesApis:
+    - backend2-graphql
