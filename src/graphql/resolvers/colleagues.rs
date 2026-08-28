@@ -5,13 +5,21 @@ use crate::{
     utils::{Maybe, db_error},
 };
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
+use icu_collator::{Collator, CollatorBorrowed, options::CollatorOptions};
+use icu_locale_core::locale;
 use prometheus::{IntCounterVec, labels};
 use sea_orm::{
     DatabaseTransaction, FromQueryResult,
     prelude::*,
     query::{QueryOrder, QuerySelect},
 };
-use std::{ops::Deref, sync::Arc};
+use std::{
+    ops::Deref,
+    sync::{Arc, LazyLock},
+};
+
+static COLLATOR: LazyLock<CollatorBorrowed<'static>> =
+    LazyLock::new(|| Collator::try_new(locale!("hu").into(), CollatorOptions::default()).unwrap());
 
 /// A staff member or colleague.
 #[derive(SimpleObject, Debug, FromQueryResult)]
@@ -83,9 +91,9 @@ impl ColleaguesQuery {
                 let b = b.name.as_ref().unwrap();
 
                 let a_name = a.strip_prefix("Dr. ").unwrap_or(a);
-                let b_name = a.strip_prefix("Dr. ").unwrap_or(b);
+                let b_name = b.strip_prefix("Dr. ").unwrap_or(b);
 
-                a_name.cmp(b_name)
+                COLLATOR.compare(a_name, b_name)
             });
         }
 
