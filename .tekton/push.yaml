@@ -9,6 +9,12 @@
 # BuildRun — the full build recipe lives inline in spec.build.spec, with
 # source.git.revision pinned to the exact pushed commit — then `oc wait`s for it
 # to complete and reports the verdict back onto the commit as a GitHub check.
+#
+# The output image MUST be tagged with the pushed commit SHA ({{ revision }}):
+# argocd-image-updater (ImageUpdater CR in website_k8s) only considers tags
+# matching ^[0-9a-f]{40}$ when opening the deploy PR against website_k8s.
+# An untagged push lands on :latest, which the updater ignores — the image
+# builds fine but never deploys.
 # `oc wait --for=jsonpath={.status.completionTime}` returns as soon as the build
 # finishes (success OR failure), so no polling loop is needed.
 apiVersion: tekton.dev/v1
@@ -41,7 +47,7 @@ spec:
         params:
           - name: SCRIPT
             value: |
-              BR=$(echo '{"apiVersion":"shipwright.io/v1beta1","kind":"BuildRun","metadata":{"generateName":"backend2-pac-","labels":{"pipelinesascode.tekton.dev/sha":"{{ revision }}","app.kubernetes.io/managed-by":"pipelines-as-code"}},"spec":{"build":{"spec":{"source":{"type":"Git","git":{"url":"https://github.com/Verseghy/website_backend2","revision":"{{ revision }}"}},"strategy":{"name":"buildah","kind":"ClusterBuildStrategy"},"paramValues":[{"name":"dockerfile","value":"Containerfile"}],"output":{"image":"ghcr.io/verseghy/website_backend2","pushSecret":"ghcr-pull-secret"},"timeout":"1h0m0s"}}}}' | oc create -o name -f -)
+              BR=$(echo '{"apiVersion":"shipwright.io/v1beta1","kind":"BuildRun","metadata":{"generateName":"backend2-pac-","labels":{"pipelinesascode.tekton.dev/sha":"{{ revision }}","app.kubernetes.io/managed-by":"pipelines-as-code"}},"spec":{"build":{"spec":{"source":{"type":"Git","git":{"url":"https://github.com/Verseghy/website_backend2","revision":"{{ revision }}"}},"strategy":{"name":"buildah","kind":"ClusterBuildStrategy"},"paramValues":[{"name":"dockerfile","value":"Containerfile"}],"output":{"image":"ghcr.io/verseghy/website_backend2:{{ revision }}","pushSecret":"ghcr-pull-secret"},"timeout":"1h0m0s"}}}}' | oc create -o name -f -)
               echo "==> Created $BR (revision {{ revision }})"
               oc wait --for=jsonpath='{.status.completionTime}' "$BR" --timeout=80m
               succeeded=$(oc get "$BR" -o jsonpath='{.status.conditions[?(@.type=="Succeeded")].status}')
