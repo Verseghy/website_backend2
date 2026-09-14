@@ -257,7 +257,6 @@ async fn page_info_of_a_filtered_list_reflects_the_filter() {
 }
 
 #[tokio::test]
-#[ignore = "bug: listing posts returns an error instead of an empty list when no post is published"]
 async fn listing_posts_without_published_posts_returns_an_empty_list() {
     let app = TestApp::empty().await;
 
