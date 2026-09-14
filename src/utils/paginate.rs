@@ -10,11 +10,25 @@ use async_graphql::{
 };
 use chrono::NaiveDate;
 use sea_orm::{
-    ColumnTrait, DatabaseTransaction, DeriveColumn, EnumIter, JoinType, Select,
+    ColumnTrait, Condition, DatabaseTransaction, DeriveColumn, EnumIter, JoinType, Select,
     entity::{EntityTrait, RelationDef},
     query::{Order, QueryFilter, QueryOrder, QuerySelect},
     sea_query::IntoCondition,
 };
+
+/// Condition matching the posts listed after `cursor`.
+///
+/// Lists are ordered by date, then id, both descending, so these are the posts
+/// with an older date, or with the same date and a lower id.
+///
+/// * `cursor` - date and id of the last post already listed.
+fn listed_after(cursor: &PostCursor) -> Condition {
+    Condition::any().add(Column::Date.lt(cursor.date())).add(
+        Condition::all()
+            .add(Column::Date.eq(cursor.date()))
+            .add(Column::Id.lt(cursor.id())),
+    )
+}
 
 fn build_paginated_posts(
     after: Option<PostCursor>,
@@ -27,16 +41,9 @@ fn build_paginated_posts(
         .column(Column::Id)
         .column(Column::Date);
 
-    if let Some(before) = before {
-        query = query
-            .filter(Column::Date.lte(before.date()))
-            .filter(Column::Id.lt(before.id()));
-    }
-
-    if let Some(after) = after {
-        query = query
-            .filter(Column::Date.lte(after.date()))
-            .filter(Column::Id.lt(after.id()));
+    // `before` selects the same posts as `after`: both page towards older posts.
+    for cursor in [before, after].into_iter().flatten() {
+        query = query.filter(listed_after(&cursor));
     }
 
     if let Some(first) = first {
