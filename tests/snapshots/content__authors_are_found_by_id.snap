@@ -4,19 +4,19 @@ expression: response
 ---
 {
   "data": {
+    "missing": null,
     "with_image": {
-      "id": 1,
-      "name": "Kovács Anna",
       "description": "Magyar és történelem szakos tanár.",
-      "image": "https://storage.test/authors_images/kovacs-anna.jpg"
+      "id": 1,
+      "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+      "name": "Kovács Anna"
     },
     "without_image": {
-      "id": 2,
-      "name": "Nagy Béla",
       "description": null,
-      "image": null
-    },
-    "missing": null
+      "id": 2,
+      "image": null,
+      "name": "Nagy Béla"
+    }
   },
   "extensions": {
     "analyzer": {

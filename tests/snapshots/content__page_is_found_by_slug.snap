@@ -4,17 +4,17 @@ expression: response
 ---
 {
   "data": {
+    "missing": null,
     "page": {
-      "id": 1,
-      "template": "default",
-      "name": "rolunk",
-      "title": "Rólunk",
       "content": "<p>Iskolánk bemutatkozása.</p>",
       "extras": {
         "meta_description": "Az iskola bemutatása"
-      }
-    },
-    "missing": null
+      },
+      "id": 1,
+      "name": "rolunk",
+      "template": "default",
+      "title": "Rólunk"
+    }
   },
   "extensions": {
     "analyzer": {

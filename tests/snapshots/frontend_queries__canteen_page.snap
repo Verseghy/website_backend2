@@ -4,21 +4,6 @@ expression: response
 ---
 {
   "data": {
-    "week2": [
-      {
-        "date": "2026-01-05",
-        "menus": [
-          {
-            "menu": "Zöldségleves",
-            "type": 0
-          },
-          {
-            "menu": "Rántott csirke rizzsel",
-            "type": 1
-          }
-        ]
-      }
-    ],
     "week1": [
       {
         "date": "2025-12-29",
@@ -46,6 +31,21 @@ expression: response
           },
           {
             "menu": "Paprikás krumpli",
+            "type": 1
+          }
+        ]
+      }
+    ],
+    "week2": [
+      {
+        "date": "2026-01-05",
+        "menus": [
+          {
+            "menu": "Zöldségleves",
+            "type": 0
+          },
+          {
+            "menu": "Rántott csirke rizzsel",
             "type": 1
           }
         ]

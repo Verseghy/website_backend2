@@ -61,7 +61,6 @@ The database is dropped when the test ends, so tests never see each other's
 data and can run in parallel.
 
 ```rust
-use insta::assert_json_snapshot;
 use test_utils::prelude::*;
 
 #[tokio::test]
@@ -70,9 +69,13 @@ async fn colleagues_are_sorted_by_name() {
 
     let response = app.graphql("{ colleagues { name } }").await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 ```
+
+`assert_response_snapshot!` is `insta::assert_json_snapshot!` with object keys
+sorted: the order of sibling fields in responses is not stable between runs,
+while array order, which tests rely on, is kept.
 
 | File | Covers |
 | --- | --- |

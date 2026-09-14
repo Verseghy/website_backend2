@@ -5,57 +5,57 @@ expression: response
 {
   "data": {
     "search": {
-      "pageInfo": {
-        "endCursor": "2025-12-19#5",
-        "hasPreviousPage": false
-      },
       "edges": [
         {
           "node": {
-            "id": 1,
-            "title": "Tanévnyitó ünnepség",
-            "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
-            "color": "#1e88e5",
-            "date": "2026-09-01",
-            "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
             "author": {
               "id": 1,
-              "name": "Kovács Anna",
-              "image": "https://storage.test/authors_images/kovacs-anna.jpg"
+              "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+              "name": "Kovács Anna"
             },
+            "color": "#1e88e5",
+            "date": "2026-09-01",
+            "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
+            "id": 1,
+            "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
             "labels": [
               {
+                "color": "#8e24aa",
                 "id": 2,
-                "name": "Ünnepségek",
-                "color": "#8e24aa"
+                "name": "Ünnepségek"
               },
               {
+                "color": "#1e88e5",
                 "id": 1,
-                "name": "Hírek",
-                "color": "#1e88e5"
+                "name": "Hírek"
               }
-            ]
+            ],
+            "title": "Tanévnyitó ünnepség"
           }
         },
         {
           "node": {
-            "id": 5,
-            "title": "Karácsonyi koncert",
-            "description": "Az iskolakórus ünnepi hangversenye.",
+            "author": null,
             "color": "#e53935",
             "date": "2025-12-19",
+            "description": "Az iskolakórus ünnepi hangversenye.",
+            "id": 5,
             "indexImage": "https://storage.test/posts_images/koncert.jpg",
-            "author": null,
             "labels": [
               {
+                "color": "#8e24aa",
                 "id": 2,
-                "name": "Ünnepségek",
-                "color": "#8e24aa"
+                "name": "Ünnepségek"
               }
-            ]
+            ],
+            "title": "Karácsonyi koncert"
           }
         }
-      ]
+      ],
+      "pageInfo": {
+        "endCursor": "2025-12-19#5",
+        "hasPreviousPage": false
+      }
     }
   },
   "extensions": {

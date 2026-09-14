@@ -1,6 +1,5 @@
 //! Pages, the navigation menu, colleagues, authors and labels.
 
-use insta::assert_json_snapshot;
 use test_utils::prelude::*;
 
 #[tokio::test]
@@ -11,7 +10,7 @@ async fn colleagues_are_sorted_by_name_in_hungarian_order() {
         .graphql("{ colleagues { id name jobs subjects roles awards image category } }")
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -28,7 +27,7 @@ async fn page_is_found_by_slug() {
         )
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -56,7 +55,7 @@ async fn menu_is_a_tree_in_position_order() {
         )
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -106,7 +105,7 @@ async fn authors_are_found_by_id() {
         )
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -117,5 +116,5 @@ async fn labels_are_found_by_id() {
         .graphql("{ label(id: 1) { id name color } missing: label(id: 99) { id } }")
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }

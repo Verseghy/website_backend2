@@ -20,8 +20,16 @@ mod database;
 pub mod prelude;
 mod response;
 pub mod seed;
+mod snapshot;
 
 pub use app::{Data, STORAGE_BASE_URL, TestApp};
 pub use config::TestConfig;
 pub use database::TestDatabase;
 pub use response::{error_messages, expect_data, node_ids, unique_name};
+
+/// Crates the exported macros expand to, so tests need no direct dependency on
+/// them. Not part of the public API.
+#[doc(hidden)]
+pub mod macro_support {
+    pub use insta;
+}

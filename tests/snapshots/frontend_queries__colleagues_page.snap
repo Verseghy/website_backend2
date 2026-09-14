@@ -6,84 +6,84 @@ expression: response
   "data": {
     "colleagues": [
       {
+        "awards": null,
+        "category": 2,
         "id": 4,
-        "name": "Ádám Éva",
+        "image": null,
         "jobs": "óraadó tanár",
-        "subjects": "rajz",
+        "name": "Ádám Éva",
         "roles": null,
-        "awards": null,
-        "image": null,
-        "category": 2
+        "subjects": "rajz"
       },
       {
+        "awards": null,
+        "category": 3,
         "id": 5,
-        "name": "Adorján Péter",
+        "image": null,
         "jobs": "rendszergazda",
-        "subjects": null,
+        "name": "Adorján Péter",
         "roles": null,
-        "awards": null,
-        "image": null,
-        "category": 3
+        "subjects": null
       },
       {
-        "id": 2,
-        "name": "Dr. Cirkó Béla",
-        "jobs": "tanár",
-        "subjects": "fizika",
-        "roles": "munkaközösség-vezető",
         "awards": "Az év tanára (2024)",
+        "category": 1,
+        "id": 2,
         "image": "https://storage.test/colleagues_images/cirko-bela.jpg",
-        "category": 1
+        "jobs": "tanár",
+        "name": "Dr. Cirkó Béla",
+        "roles": "munkaközösség-vezető",
+        "subjects": "fizika"
       },
       {
+        "awards": null,
+        "category": 0,
         "id": 3,
-        "name": "Csizmadia Ágnes",
-        "jobs": "igazgatóhelyettes",
-        "subjects": "matematika",
-        "roles": null,
-        "awards": null,
         "image": "https://storage.test/colleagues_images/csizmadia-agnes.jpg",
-        "category": 0
+        "jobs": "igazgatóhelyettes",
+        "name": "Csizmadia Ágnes",
+        "roles": null,
+        "subjects": "matematika"
       },
       {
+        "awards": null,
+        "category": 1,
         "id": 1,
+        "image": null,
+        "jobs": "tanár",
         "name": "Oláh Zsófia",
-        "jobs": "tanár",
-        "subjects": "angol nyelv",
         "roles": null,
-        "awards": null,
-        "image": null,
-        "category": 1
+        "subjects": "angol nyelv"
       },
       {
+        "awards": null,
+        "category": 4,
         "id": 6,
-        "name": "Őri Gábor",
+        "image": null,
         "jobs": "karbantartó",
-        "subjects": null,
+        "name": "Őri Gábor",
         "roles": null,
-        "awards": null,
-        "image": null,
-        "category": 4
+        "subjects": null
       },
       {
+        "awards": null,
+        "category": 0,
         "id": 8,
-        "name": "Zakariás Ottó",
-        "jobs": "tanár",
-        "subjects": "testnevelés",
-        "roles": null,
-        "awards": null,
         "image": null,
-        "category": 0
+        "jobs": "tanár",
+        "name": "Zakariás Ottó",
+        "roles": null,
+        "subjects": "testnevelés"
       },
       {
-        "id": 7,
-        "name": "Zsigmond Lili",
-        "jobs": "tanár",
-        "subjects": "biológia",
-        "roles": null,
         "awards": null,
+        "category": 1,
+        "id": 7,
         "image": null,
-        "category": 1
+        "jobs": "tanár",
+        "name": "Zsigmond Lili",
+        "roles": null,
+        "subjects": "biológia"
       }
     ]
   },

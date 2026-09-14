@@ -6,28 +6,28 @@ expression: response
   "data": {
     "events": [
       {
-        "id": 2,
-        "title": "Szülői értekezlet",
+        "color": "#fb8c00",
         "dateFrom": "2026-08-31 17:00:00",
         "dateTo": "2026-08-31 19:00:00",
         "description": "Minden évfolyam",
-        "color": "#fb8c00"
+        "id": 2,
+        "title": "Szülői értekezlet"
       },
       {
-        "id": 3,
-        "title": "Tanévnyitó",
+        "color": "#1e88e5",
         "dateFrom": "2026-09-01 08:00:00",
         "dateTo": "2026-09-01 10:00:00",
         "description": "Díszterem",
-        "color": "#1e88e5"
+        "id": 3,
+        "title": "Tanévnyitó"
       },
       {
-        "id": 4,
-        "title": "Témahét",
+        "color": "#43a047",
         "dateFrom": "2026-09-28 08:00:00",
         "dateTo": "2026-10-02 14:00:00",
         "description": null,
-        "color": "#43a047"
+        "id": 4,
+        "title": "Témahét"
       }
     ]
   },

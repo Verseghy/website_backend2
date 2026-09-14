@@ -6,47 +6,47 @@ expression: response
   "data": {
     "menu": [
       {
-        "name": "Iskolánk",
-        "type": "internal_link",
-        "link": "/informaciok",
-        "slug": null,
         "children": [
           {
-            "name": "Rólunk",
-            "type": "page_link",
+            "children": [],
             "link": null,
+            "name": "Rólunk",
             "slug": "rolunk",
-            "children": []
+            "type": "page_link"
           },
           {
-            "name": "Régi oldal",
-            "type": "page_link",
+            "children": [],
             "link": null,
+            "name": "Régi oldal",
             "slug": "regi-oldal",
-            "children": []
+            "type": "page_link"
           }
-        ]
+        ],
+        "link": "/informaciok",
+        "name": "Iskolánk",
+        "slug": null,
+        "type": "internal_link"
       },
       {
-        "name": "Kapcsolat",
-        "type": "page_link",
+        "children": [],
         "link": null,
+        "name": "Kapcsolat",
         "slug": "kapcsolat",
-        "children": []
+        "type": "page_link"
       },
       {
-        "name": "E-napló",
-        "type": "external_link",
+        "children": [],
         "link": "https://example.test/e-naplo",
+        "name": "E-napló",
         "slug": null,
-        "children": []
+        "type": "external_link"
       },
       {
-        "name": "Törölt menüpont",
-        "type": "external_link",
+        "children": [],
         "link": "https://example.test/torolt",
+        "name": "Törölt menüpont",
         "slug": null,
-        "children": []
+        "type": "external_link"
       }
     ]
   },

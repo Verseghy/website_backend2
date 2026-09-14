@@ -1,6 +1,5 @@
 //! Listing, searching, looking up and paginating posts.
 
-use insta::assert_json_snapshot;
 use test_utils::prelude::*;
 
 /// Node ids of the connection at `data.<field>`.
@@ -115,7 +114,7 @@ async fn archive_counts_published_posts_per_month_newest_first() {
         .graphql("{ archive { info { year month count } } }")
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -132,7 +131,7 @@ async fn archive_lists_the_published_posts_of_a_month() {
         )
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]

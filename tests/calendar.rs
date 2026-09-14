@@ -1,6 +1,5 @@
 //! Date-based queries: canteen menus by ISO week and events by month.
 
-use insta::assert_json_snapshot;
 use test_utils::prelude::*;
 
 #[tokio::test]
@@ -12,7 +11,7 @@ async fn canteen_week_spanning_new_year() {
         .graphql("{ canteen(year: 2026, week: 1) { id date menus { id menu type } } }")
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -52,7 +51,7 @@ async fn events_of_a_month_cover_its_calendar_grid() {
         .graphql("{ events(year: 2026, month: 9) { id title dateFrom dateTo description color } }")
         .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]

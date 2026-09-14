@@ -5,9 +5,9 @@ expression: response
 {
   "data": {
     "label": {
+      "color": "#1e88e5",
       "id": 1,
-      "name": "Hírek",
-      "color": "#1e88e5"
+      "name": "Hírek"
     },
     "missing": null
   },

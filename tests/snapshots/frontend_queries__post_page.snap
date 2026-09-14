@@ -5,35 +5,35 @@ expression: response
 {
   "data": {
     "post": {
-      "id": 1,
-      "title": "Tanévnyitó ünnepség",
+      "author": {
+        "description": "Magyar és történelem szakos tanár.",
+        "id": 1,
+        "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+        "name": "Kovács Anna"
+      },
       "color": "#1e88e5",
-      "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
       "content": "<p>Az ünnepségen a diákok műsorral készültek.</p>",
       "date": "2026-09-01",
-      "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
+      "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
+      "id": 1,
       "images": [
         "https://storage.test/posts_images/tanevnyito-1.jpg",
         "https://storage.test/posts_images/tanevnyito-2.jpg"
       ],
-      "author": {
-        "id": 1,
-        "name": "Kovács Anna",
-        "description": "Magyar és történelem szakos tanár.",
-        "image": "https://storage.test/authors_images/kovacs-anna.jpg"
-      },
+      "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
       "labels": [
         {
-          "id": 2,
           "color": "#8e24aa",
+          "id": 2,
           "name": "Ünnepségek"
         },
         {
-          "id": 1,
           "color": "#1e88e5",
+          "id": 1,
           "name": "Hírek"
         }
-      ]
+      ],
+      "title": "Tanévnyitó ünnepség"
     }
   },
   "extensions": {

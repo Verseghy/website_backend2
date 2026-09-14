@@ -5,7 +5,6 @@
 //! below mirror what the site passes. When the frontend changes an operation,
 //! update the copy so the backend stays tested against what the site requests.
 
-use insta::assert_json_snapshot;
 use test_utils::prelude::*;
 
 async fn run(document: &str, variables: Value) -> Value {
@@ -22,14 +21,14 @@ async fn home_page() {
     )
     .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
 async fn post_page() {
     let response = run(include_str!("frontend/post.graphql"), json!({ "id": 1 })).await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -52,7 +51,7 @@ async fn search_page_by_term() {
     )
     .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -63,7 +62,7 @@ async fn search_page_by_author() {
     )
     .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -74,7 +73,7 @@ async fn search_page_by_label() {
     )
     .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -86,21 +85,21 @@ async fn canteen_page() {
     )
     .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
 async fn colleagues_page() {
     let response = run(include_str!("frontend/colleagues.graphql"), json!({})).await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
 async fn information_page_menu() {
     let response = run(include_str!("frontend/information_menu.graphql"), json!({})).await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }
 
 #[tokio::test]
@@ -111,5 +110,5 @@ async fn page() {
     )
     .await;
 
-    assert_json_snapshot!(response);
+    assert_response_snapshot!(response);
 }

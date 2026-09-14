@@ -7,19 +7,19 @@ expression: response
     "archive": {
       "december": [
         {
+          "date": "2025-12-19",
           "id": 5,
-          "title": "Karácsonyi koncert",
-          "date": "2025-12-19"
+          "title": "Karácsonyi koncert"
         }
       ],
+      "empty": [],
       "september": [
         {
+          "date": "2026-09-01",
           "id": 1,
-          "title": "Tanévnyitó ünnepség",
-          "date": "2026-09-01"
+          "title": "Tanévnyitó ünnepség"
         }
-      ],
-      "empty": []
+      ]
     }
   },
   "extensions": {
