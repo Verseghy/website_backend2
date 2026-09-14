@@ -1,0 +1,14 @@
+# Copied from website_frontend2 src/data/colleagues.data.ts: QUERY.
+
+query Colleagues {
+  colleagues {
+    id
+    name
+    jobs
+    subjects
+    roles
+    awards
+    image
+    category
+  }
+}

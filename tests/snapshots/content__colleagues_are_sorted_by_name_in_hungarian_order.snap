@@ -1,0 +1,96 @@
+---
+source: tests/content.rs
+expression: response
+---
+{
+  "data": {
+    "colleagues": [
+      {
+        "id": 4,
+        "name": "Ádám Éva",
+        "jobs": "óraadó tanár",
+        "subjects": "rajz",
+        "roles": null,
+        "awards": null,
+        "image": null,
+        "category": 2
+      },
+      {
+        "id": 5,
+        "name": "Adorján Péter",
+        "jobs": "rendszergazda",
+        "subjects": null,
+        "roles": null,
+        "awards": null,
+        "image": null,
+        "category": 3
+      },
+      {
+        "id": 2,
+        "name": "Dr. Cirkó Béla",
+        "jobs": "tanár",
+        "subjects": "fizika",
+        "roles": "munkaközösség-vezető",
+        "awards": "Az év tanára (2024)",
+        "image": "https://storage.test/colleagues_images/cirko-bela.jpg",
+        "category": 1
+      },
+      {
+        "id": 3,
+        "name": "Csizmadia Ágnes",
+        "jobs": "igazgatóhelyettes",
+        "subjects": "matematika",
+        "roles": null,
+        "awards": null,
+        "image": "https://storage.test/colleagues_images/csizmadia-agnes.jpg",
+        "category": 0
+      },
+      {
+        "id": 1,
+        "name": "Oláh Zsófia",
+        "jobs": "tanár",
+        "subjects": "angol nyelv",
+        "roles": null,
+        "awards": null,
+        "image": null,
+        "category": 1
+      },
+      {
+        "id": 6,
+        "name": "Őri Gábor",
+        "jobs": "karbantartó",
+        "subjects": null,
+        "roles": null,
+        "awards": null,
+        "image": null,
+        "category": 4
+      },
+      {
+        "id": 8,
+        "name": "Zakariás Ottó",
+        "jobs": "tanár",
+        "subjects": "testnevelés",
+        "roles": null,
+        "awards": null,
+        "image": null,
+        "category": 0
+      },
+      {
+        "id": 7,
+        "name": "Zsigmond Lili",
+        "jobs": "tanár",
+        "subjects": "biológia",
+        "roles": null,
+        "awards": null,
+        "image": null,
+        "category": 1
+      }
+    ]
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 9,
+      "depth": 2
+    }
+  }
+}

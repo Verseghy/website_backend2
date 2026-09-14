@@ -1,0 +1,25 @@
+---
+source: tests/content.rs
+expression: response
+---
+{
+  "data": {
+    "page": {
+      "id": 1,
+      "template": "default",
+      "name": "rolunk",
+      "title": "Rólunk",
+      "content": "<p>Iskolánk bemutatkozása.</p>",
+      "extras": {
+        "meta_description": "Az iskola bemutatása"
+      }
+    },
+    "missing": null
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 9,
+      "depth": 2
+    }
+  }
+}

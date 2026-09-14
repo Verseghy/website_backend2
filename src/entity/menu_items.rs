@@ -6,15 +6,18 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "menu_items")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: u32,
+    #[sea_orm(column_type = "String(StringLen::N(100))")]
     pub name: String,
+    #[sea_orm(column_type = "String(StringLen::N(20))")]
     pub r#type: String,
+    #[sea_orm(column_type = "String(StringLen::N(255))")]
     pub link: Option<String>,
-    pub page_id: Option<i32>,
-    pub parent_id: Option<i32>,
-    pub lft: i32,
-    pub rgt: i32,
-    pub depth: i32,
+    pub page_id: Option<u32>,
+    pub parent_id: Option<u32>,
+    pub lft: u32,
+    pub rgt: u32,
+    pub depth: u32,
     pub created_at: DateTime,
     pub updated_at: DateTime,
     pub deleted_at: Option<DateTime>,

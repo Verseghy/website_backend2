@@ -6,20 +6,28 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "posts_data")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: u32,
+    #[sea_orm(column_type = "String(StringLen::N(191))")]
     pub title: String,
+    #[sea_orm(column_type = "String(StringLen::N(7))")]
     pub color: String,
+    #[sea_orm(column_type = "Text")]
     pub description: Option<String>,
+    #[sea_orm(column_type = "Text")]
     pub content: Option<String>,
+    #[sea_orm(column_type = "String(StringLen::N(191))")]
     pub index_image: Option<String>,
-    pub author_id: Option<i32>,
+    pub author_id: Option<u32>,
     pub images: Json,
-    pub date: Option<DateTime>,
+    pub date: Option<Date>,
     pub created_at: DateTime,
     pub updated_at: DateTime,
     pub featured: i8,
     pub published: i8,
-    #[sea_orm(column_name = "previewToken")]
+    #[sea_orm(
+        column_name = "previewToken",
+        column_type = "String(StringLen::N(191))"
+    )]
     pub preview_token: Option<String>,
 }
 

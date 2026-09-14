@@ -1,0 +1,35 @@
+# Copied from website_frontend2 src/data/search.data.ts: TERM_QUERY with
+# FRAGMENT inlined.
+
+query TermQuery($term: String!) {
+  search(term: $term, last: 20) {
+    ...Posts
+  }
+}
+
+fragment Posts on PostConnection {
+  edges {
+    node {
+      id
+      title
+      description
+      color
+      author {
+        id
+        name
+        image
+      }
+      date
+      indexImage
+      labels {
+        id
+        name
+        color
+      }
+    }
+  }
+  pageInfo {
+    endCursor
+    hasPreviousPage
+  }
+}

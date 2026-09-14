@@ -1,0 +1,37 @@
+# Copied from website_frontend2 src/data/search.data.ts: AUTHOR_QUERY with
+# FRAGMENT inlined.
+
+query AuthorQuery($authorID: Int!) {
+  author(id: $authorID) {
+    posts {
+      ...Posts
+    }
+  }
+}
+
+fragment Posts on PostConnection {
+  edges {
+    node {
+      id
+      title
+      description
+      color
+      author {
+        id
+        name
+        image
+      }
+      date
+      indexImage
+      labels {
+        id
+        name
+        color
+      }
+    }
+  }
+  pageInfo {
+    endCursor
+    hasPreviousPage
+  }
+}

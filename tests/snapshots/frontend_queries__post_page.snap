@@ -1,0 +1,45 @@
+---
+source: tests/frontend_queries.rs
+expression: response
+---
+{
+  "data": {
+    "post": {
+      "id": 1,
+      "title": "Tanévnyitó ünnepség",
+      "color": "#1e88e5",
+      "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
+      "content": "<p>Az ünnepségen a diákok műsorral készültek.</p>",
+      "date": "2026-09-01",
+      "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
+      "images": [
+        "https://storage.test/posts_images/tanevnyito-1.jpg",
+        "https://storage.test/posts_images/tanevnyito-2.jpg"
+      ],
+      "author": {
+        "id": 1,
+        "name": "Kovács Anna",
+        "description": "Magyar és történelem szakos tanár.",
+        "image": "https://storage.test/authors_images/kovacs-anna.jpg"
+      },
+      "labels": [
+        {
+          "id": 2,
+          "color": "#8e24aa",
+          "name": "Ünnepségek"
+        },
+        {
+          "id": 1,
+          "color": "#1e88e5",
+          "name": "Hírek"
+        }
+      ]
+    }
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 18,
+      "depth": 3
+    }
+  }
+}

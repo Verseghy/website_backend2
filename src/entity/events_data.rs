@@ -6,12 +6,15 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "events_data")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: u32,
     pub date_from: DateTime,
     pub date_to: DateTime,
+    #[sea_orm(column_type = "String(StringLen::N(191))")]
     pub title: String,
+    #[sea_orm(column_type = "String(StringLen::N(191))")]
     pub description: Option<String>,
-    pub color: Option<String>,
+    #[sea_orm(column_type = "String(StringLen::N(7))")]
+    pub color: String,
     pub created_at: DateTime,
     pub updated_at: DateTime,
 }

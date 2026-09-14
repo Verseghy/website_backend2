@@ -1,0 +1,27 @@
+---
+source: tests/content.rs
+expression: response
+---
+{
+  "data": {
+    "with_image": {
+      "id": 1,
+      "name": "Kovács Anna",
+      "description": "Magyar és történelem szakos tanár.",
+      "image": "https://storage.test/authors_images/kovacs-anna.jpg"
+    },
+    "without_image": {
+      "id": 2,
+      "name": "Nagy Béla",
+      "description": null,
+      "image": null
+    },
+    "missing": null
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 12,
+      "depth": 2
+    }
+  }
+}

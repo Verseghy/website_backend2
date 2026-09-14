@@ -1,0 +1,43 @@
+---
+source: tests/posts.rs
+expression: response
+---
+{
+  "data": {
+    "archive": {
+      "info": [
+        {
+          "year": 2026,
+          "month": 9,
+          "count": 1
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "count": 1
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "count": 1
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "count": 1
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "count": 1
+        }
+      ]
+    }
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 5,
+      "depth": 3
+    }
+  }
+}

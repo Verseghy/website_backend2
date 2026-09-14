@@ -26,5 +26,12 @@ icu_collator = "2.3.1"
 icu_locale_core = "2.3.0"
 
 [dev-dependencies]
-insta = "1.48.0"
+insta = { version = "1.48.0", features = ["json"] }
 proptest = "1.11.0"
+sha2 = "0.10.9"
+test-utils = { path = "test-utils" }
+
+# test-utils is a separate crate so integration tests share one harness; it
+# depends on this crate, which only uses it as a dev-dependency.
+[workspace]
+members = [".", "test-utils"]

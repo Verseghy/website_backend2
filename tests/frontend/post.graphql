@@ -1,0 +1,25 @@
+# Copied from website_frontend2 src/data/post.data.ts: QUERY.
+
+query Post($id: Int!) {
+  post(id: $id) {
+    id
+    title
+    color
+    description
+    content
+    date
+    indexImage
+    images
+    author {
+      id
+      name
+      description
+      image
+    }
+    labels {
+      id
+      color
+      name
+    }
+  }
+}

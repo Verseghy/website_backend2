@@ -6,14 +6,20 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "colleagues_data")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: u32,
+    #[sea_orm(column_type = "String(StringLen::N(191))")]
     pub name: Option<String>,
+    #[sea_orm(column_type = "Text")]
     pub jobs: Option<String>,
+    #[sea_orm(column_type = "Text")]
     pub subjects: Option<String>,
+    #[sea_orm(column_type = "Text")]
     pub roles: Option<String>,
+    #[sea_orm(column_type = "Text")]
     pub awards: Option<String>,
+    #[sea_orm(column_type = "String(StringLen::N(191))")]
     pub image: Option<String>,
-    pub category: Option<i16>,
+    pub category: Option<u16>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter)]

@@ -1,0 +1,18 @@
+# Copied from website_frontend2 src/data/canteen.data.ts: QUERY.
+
+query CanteenTwoWeeks($year1: Int!, $week1: Int!, $year2: Int!, $week2: Int!) {
+  week1: canteen(year: $year1, week: $week1) {
+    ...canteen
+  }
+  week2: canteen(year: $year2, week: $week2) {
+    ...canteen
+  }
+}
+
+fragment canteen on Canteen {
+  date
+  menus {
+    menu
+    type
+  }
+}

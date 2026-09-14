@@ -1,0 +1,12 @@
+# Copied from website_frontend2 src/data/pages.data.ts: QUERY.
+
+query Page($slug: String!) {
+  page(slug: $slug) {
+    id
+    template
+    name
+    title
+    content
+    extras
+  }
+}
