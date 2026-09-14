@@ -74,6 +74,9 @@ jobs:
     name: cargo-deny check ${{ matrix.checks }}
     runs-on: ubuntu-latest
     strategy:
+      # Advisories can fail for reasons outside this repository; don't let that
+      # cancel the bans/licenses/sources check.
+      fail-fast: false
       matrix:
         checks:
           - advisories
