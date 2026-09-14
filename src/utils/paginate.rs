@@ -62,18 +62,31 @@ enum QueryMinMax {
     Id,
 }
 
-/// `(date, id)` of the oldest and the newest published post, or `None` if no
-/// post is published.
+/// `(date, id)` of the oldest and the newest post a list can show, or `None`
+/// if it can show none.
 ///
 /// * `db` - transaction of the current request.
-async fn get_published_posts_min_max_id(
+/// * `condition` - the list's filter, such as an author or a label.
+/// * `join` - relation the filter needs, such as the label pivot table.
+///
+/// As in the list itself, only published posts count.
+async fn get_listed_posts_min_max_id(
     db: &DatabaseTransaction,
+    condition: &sea_orm::Condition,
+    join: Option<fn() -> RelationDef>,
 ) -> Result<Option<((NaiveDate, u32), (NaiveDate, u32))>> {
     let order_by = |order: Order| async move {
-        PostsData::find()
+        let mut query = PostsData::find()
             .select_only()
             .column(Column::Date)
-            .column(Column::Id)
+            .column(Column::Id);
+
+        if let Some(join) = join {
+            query = query.join_rev(JoinType::Join, join());
+        }
+
+        query
+            .filter(condition.clone())
             .filter(Column::Published.eq(true))
             .order_by(Column::Date, order.clone())
             .order_by(Column::Id, order)
@@ -117,11 +130,15 @@ pub async fn create_paginated_posts<C>(
     ctx: &Context<'_>,
     db: &DatabaseTransaction,
     condition: C,
-    join: Option<RelationDef>,
+    // A function rather than a `RelationDef`: the join is applied to two
+    // queries, and `RelationDef` cannot be cloned.
+    join: Option<fn() -> RelationDef>,
 ) -> Result<Connection<PostCursor, Post, EmptyFields, EmptyFields>>
 where
     C: IntoCondition,
 {
+    let condition = condition.into_condition();
+
     query(
         after,
         before,
@@ -136,11 +153,11 @@ where
                 "labels" => Column::Id);
 
             if let Some(join) = join {
-                query = query.join_rev(JoinType::Join, join);
+                query = query.join_rev(JoinType::Join, join());
             }
 
             let mut res = query
-                .filter(condition)
+                .filter(condition.clone())
                 .filter(Column::Published.eq(true))
                 .into_model::<Post>()
                 .all(db)
@@ -149,9 +166,9 @@ where
 
             res.sort_by_key(|p| std::cmp::Reverse(p.date));
 
-            // Without any published post, `res` is empty and there is nothing
-            // before or after it.
-            let mut connection = match get_published_posts_min_max_id(db).await? {
+            // When the list can show no post at all, `res` is empty and there
+            // is nothing before or after it.
+            let mut connection = match get_listed_posts_min_max_id(db, &condition, join).await? {
                 Some((min, max)) => get_connection(&res, min, max)?,
                 None => Connection::new(false, false),
             };

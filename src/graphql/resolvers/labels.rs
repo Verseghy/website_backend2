@@ -65,7 +65,7 @@ impl Label {
             ctx,
             db,
             condition,
-            Some(posts_pivot_labels_data::Relation::Posts.def()),
+            Some(|| posts_pivot_labels_data::Relation::Posts.def()),
         )
         .await
     }
