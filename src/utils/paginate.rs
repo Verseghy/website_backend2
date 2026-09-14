@@ -163,3 +163,100 @@ where
     )
     .await
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{graphql::types::Date, utils::Maybe};
+
+    fn date(year: i32, month: u32, day: u32) -> NaiveDate {
+        NaiveDate::from_ymd_opt(year, month, day).unwrap()
+    }
+
+    /// A post with only the columns `get_connection` reads.
+    fn post(id: u32, date: NaiveDate) -> Post {
+        Post {
+            id: Maybe(Some(id)),
+            title: Maybe(None),
+            color: Maybe(None),
+            description: Maybe(None),
+            content: Maybe(None),
+            index_image: Maybe(None),
+            author_id: Maybe(None),
+            images: Maybe(None),
+            date: Maybe(Some(Date(date))),
+        }
+    }
+
+    /// `(date, id)` of the oldest and newest published post in these tests.
+    fn bounds() -> ((NaiveDate, u32), (NaiveDate, u32)) {
+        ((date(2024, 1, 1), 1), (date(2024, 12, 1), 10))
+    }
+
+    #[test]
+    fn empty_page_has_neither_previous_nor_next_page() {
+        let (min, max) = bounds();
+
+        let connection = get_connection(&[], min, max).unwrap();
+
+        assert!(!connection.has_previous_page);
+        assert!(!connection.has_next_page);
+    }
+
+    // Pages list posts newest first, and the flags are the reverse of the Relay
+    // naming: `hasPreviousPage` reports that *older* posts exist and
+    // `hasNextPage` that *newer* posts exist. website_frontend2 requests
+    // `hasPreviousPage` and `endCursor` for its post lists, so these tests pin
+    // the current meaning rather than the Relay one.
+
+    #[test]
+    fn page_in_the_middle_has_older_and_newer_posts() {
+        let (min, max) = bounds();
+        let page = [post(6, date(2024, 6, 1)), post(5, date(2024, 5, 1))];
+
+        let connection = get_connection(&page, min, max).unwrap();
+
+        assert!(connection.has_previous_page);
+        assert!(connection.has_next_page);
+    }
+
+    #[test]
+    fn page_ending_with_the_oldest_post_has_no_previous_page() {
+        let (min, max) = bounds();
+        let page = [post(2, date(2024, 2, 1)), post(1, date(2024, 1, 1))];
+
+        let connection = get_connection(&page, min, max).unwrap();
+
+        assert!(!connection.has_previous_page);
+        assert!(connection.has_next_page);
+    }
+
+    #[test]
+    fn page_starting_with_the_newest_post_has_no_next_page() {
+        let (min, max) = bounds();
+        let page = [post(10, date(2024, 12, 1)), post(9, date(2024, 11, 1))];
+
+        let connection = get_connection(&page, min, max).unwrap();
+
+        assert!(connection.has_previous_page);
+        assert!(!connection.has_next_page);
+    }
+
+    #[test]
+    fn post_without_a_date_is_an_error() {
+        let (min, max) = bounds();
+        let mut undated = post(5, date(2024, 5, 1));
+        undated.date = Maybe(None);
+
+        assert!(get_connection(&[undated], min, max).is_err());
+    }
+
+    #[test]
+    fn post_without_an_id_is_an_error() {
+        let (min, max) = bounds();
+        let mut anonymous = post(5, date(2024, 5, 1));
+        anonymous.id = Maybe(None);
+
+        assert!(get_connection(&[anonymous], min, max).is_err());
+    }
+}

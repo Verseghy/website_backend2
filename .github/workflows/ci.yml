@@ -1,97 +1,88 @@
 name: CI
-on: [push]
 
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+# Job names are referenced by the branch protection rules on master (Build,
+# Format, Clippy, Test). Renaming a job blocks merging until the rule is updated.
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - id: install
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
-      - name: restore build & cargo cache
-        uses: Swatinem/rust-cache@v1
-
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --locked
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo build
+        run: cargo build --locked
 
   fmt:
     name: Format
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - id: install
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
           components: rustfmt
-
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: -- --check
+      - name: cargo fmt
+        run: cargo fmt --check
 
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - id: install
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
           components: clippy
-
-      - name: restore build & cargo cache
-        uses: Swatinem/rust-cache@v1
-
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --locked -- -D warnings
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo clippy
+        # --all-targets lints the test code as well.
+        run: cargo clippy --locked --all-targets -- -D warnings
 
   test:
     name: Test
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - id: install
-        uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
         with:
-          toolchain: stable
-          override: true
-
-      - name: restore build & cargo cache
-        uses: Swatinem/rust-cache@v1
-
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
+          tool: cargo-nextest
+      - name: cargo nextest
+        # insta detects CI and fails on any snapshot mismatch instead of
+        # writing a new snapshot.
+        run: cargo nextest run --locked --all-targets
+      - name: doctests
+        # nextest does not run doctests.
+        run: cargo test --locked --doc
 
   cargo-deny:
     name: cargo-deny check ${{ matrix.checks }}
     runs-on: ubuntu-latest
     strategy:
+      # Advisories can fail for reasons outside this repository; don't let that
+      # cancel the bans/licenses/sources check.
+      fail-fast: false
       matrix:
         checks:
           - advisories
           - bans licenses sources
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: cargo-deny check ${{ matrix.checks }}
         uses: EmbarkStudios/cargo-deny-action@v2
         with:
