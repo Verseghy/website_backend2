@@ -1,0 +1,37 @@
+# Copied from website_frontend2 src/data/home.data.ts: QUERY_INITIAL with
+# QUERY_POSTS_FRAGMENT inlined.
+
+fragment PostsFragment on PostConnection {
+  edges {
+    node {
+      id
+      title
+      description
+      color
+      author {
+        name
+        image
+      }
+      date
+      indexImage
+      labels {
+        id
+        name
+        color
+      }
+    }
+  }
+}
+
+query Posts($first: Int, $numFeaturedPosts: Int) {
+  featuredPosts: posts(featured: true, first: $numFeaturedPosts) {
+    ...PostsFragment,
+  }
+  posts(first: $first) {
+    ...PostsFragment,
+    pageInfo {
+      endCursor
+      hasPreviousPage
+    }
+  }
+}

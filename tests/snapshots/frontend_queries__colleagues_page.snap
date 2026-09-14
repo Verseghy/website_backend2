@@ -1,0 +1,96 @@
+---
+source: tests/frontend_queries.rs
+expression: response
+---
+{
+  "data": {
+    "colleagues": [
+      {
+        "awards": null,
+        "category": 2,
+        "id": 4,
+        "image": null,
+        "jobs": "óraadó tanár",
+        "name": "Ádám Éva",
+        "roles": null,
+        "subjects": "rajz"
+      },
+      {
+        "awards": null,
+        "category": 3,
+        "id": 5,
+        "image": null,
+        "jobs": "rendszergazda",
+        "name": "Adorján Péter",
+        "roles": null,
+        "subjects": null
+      },
+      {
+        "awards": "Az év tanára (2024)",
+        "category": 1,
+        "id": 2,
+        "image": "https://storage.test/colleagues_images/cirko-bela.jpg",
+        "jobs": "tanár",
+        "name": "Dr. Cirkó Béla",
+        "roles": "munkaközösség-vezető",
+        "subjects": "fizika"
+      },
+      {
+        "awards": null,
+        "category": 0,
+        "id": 3,
+        "image": "https://storage.test/colleagues_images/csizmadia-agnes.jpg",
+        "jobs": "igazgatóhelyettes",
+        "name": "Csizmadia Ágnes",
+        "roles": null,
+        "subjects": "matematika"
+      },
+      {
+        "awards": null,
+        "category": 1,
+        "id": 1,
+        "image": null,
+        "jobs": "tanár",
+        "name": "Oláh Zsófia",
+        "roles": null,
+        "subjects": "angol nyelv"
+      },
+      {
+        "awards": null,
+        "category": 4,
+        "id": 6,
+        "image": null,
+        "jobs": "karbantartó",
+        "name": "Őri Gábor",
+        "roles": null,
+        "subjects": null
+      },
+      {
+        "awards": null,
+        "category": 0,
+        "id": 8,
+        "image": null,
+        "jobs": "tanár",
+        "name": "Zakariás Ottó",
+        "roles": null,
+        "subjects": "testnevelés"
+      },
+      {
+        "awards": null,
+        "category": 1,
+        "id": 7,
+        "image": null,
+        "jobs": "tanár",
+        "name": "Zsigmond Lili",
+        "roles": null,
+        "subjects": "biológia"
+      }
+    ]
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 9,
+      "depth": 2
+    }
+  }
+}

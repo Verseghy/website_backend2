@@ -1,0 +1,171 @@
+---
+source: tests/frontend_queries.rs
+expression: response
+---
+{
+  "data": {
+    "featuredPosts": {
+      "edges": [
+        {
+          "node": {
+            "author": {
+              "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+              "name": "Kovács Anna"
+            },
+            "color": "#1e88e5",
+            "date": "2026-09-01",
+            "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
+            "id": 1,
+            "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
+            "labels": [
+              {
+                "color": "#8e24aa",
+                "id": 2,
+                "name": "Ünnepségek"
+              },
+              {
+                "color": "#1e88e5",
+                "id": 1,
+                "name": "Hírek"
+              }
+            ],
+            "title": "Tanévnyitó ünnepség"
+          }
+        },
+        {
+          "node": {
+            "author": null,
+            "color": "#e53935",
+            "date": "2025-12-19",
+            "description": "Az iskolakórus ünnepi hangversenye.",
+            "id": 5,
+            "indexImage": "https://storage.test/posts_images/koncert.jpg",
+            "labels": [
+              {
+                "color": "#8e24aa",
+                "id": 2,
+                "name": "Ünnepségek"
+              }
+            ],
+            "title": "Karácsonyi koncert"
+          }
+        }
+      ]
+    },
+    "posts": {
+      "edges": [
+        {
+          "node": {
+            "author": {
+              "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+              "name": "Kovács Anna"
+            },
+            "color": "#1e88e5",
+            "date": "2026-09-01",
+            "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
+            "id": 1,
+            "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
+            "labels": [
+              {
+                "color": "#8e24aa",
+                "id": 2,
+                "name": "Ünnepségek"
+              },
+              {
+                "color": "#1e88e5",
+                "id": 1,
+                "name": "Hírek"
+              }
+            ],
+            "title": "Tanévnyitó ünnepség"
+          }
+        },
+        {
+          "node": {
+            "author": {
+              "image": null,
+              "name": "Nagy Béla"
+            },
+            "color": "#43a047",
+            "date": "2026-08-20",
+            "description": "Futóverseny és focibajnokság az udvaron.",
+            "id": 2,
+            "indexImage": "https://storage.test/posts_images/sportnap.jpg",
+            "labels": [
+              {
+                "color": "#43a047",
+                "id": 3,
+                "name": "Sport"
+              }
+            ],
+            "title": "Őszi sportnap"
+          }
+        },
+        {
+          "node": {
+            "author": {
+              "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+              "name": "Kovács Anna"
+            },
+            "color": "#fb8c00",
+            "date": "2026-07-10",
+            "description": null,
+            "id": 3,
+            "indexImage": "https://storage.test/posts_images/tabor.jpg",
+            "labels": [],
+            "title": "Nyári tábor beszámoló"
+          }
+        },
+        {
+          "node": {
+            "author": {
+              "image": null,
+              "name": "Nagy Béla"
+            },
+            "color": "#fdd835",
+            "date": "2026-02-13",
+            "description": "Utólag rögzített beszámoló.",
+            "id": 6,
+            "indexImage": "https://storage.test/posts_images/farsang.jpg",
+            "labels": [
+              {
+                "color": "#1e88e5",
+                "id": 1,
+                "name": "Hírek"
+              }
+            ],
+            "title": "Farsangi bál"
+          }
+        },
+        {
+          "node": {
+            "author": null,
+            "color": "#e53935",
+            "date": "2025-12-19",
+            "description": "Az iskolakórus ünnepi hangversenye.",
+            "id": 5,
+            "indexImage": "https://storage.test/posts_images/koncert.jpg",
+            "labels": [
+              {
+                "color": "#8e24aa",
+                "id": 2,
+                "name": "Ünnepségek"
+              }
+            ],
+            "title": "Karácsonyi koncert"
+          }
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "2025-12-19#5",
+        "hasPreviousPage": false
+      }
+    }
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 35,
+      "depth": 5
+    }
+  }
+}

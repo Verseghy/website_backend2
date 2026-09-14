@@ -1,0 +1,24 @@
+---
+source: tests/frontend_queries.rs
+expression: response
+---
+{
+  "data": {
+    "page": {
+      "content": "<p>Iskolánk bemutatkozása.</p>",
+      "extras": {
+        "meta_description": "Az iskola bemutatása"
+      },
+      "id": 1,
+      "name": "rolunk",
+      "template": "default",
+      "title": "Rólunk"
+    }
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 7,
+      "depth": 2
+    }
+  }
+}

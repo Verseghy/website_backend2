@@ -1,0 +1,67 @@
+---
+source: tests/frontend_queries.rs
+expression: response
+---
+{
+  "data": {
+    "author": {
+      "posts": {
+        "edges": [
+          {
+            "node": {
+              "author": {
+                "id": 1,
+                "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+                "name": "Kovács Anna"
+              },
+              "color": "#1e88e5",
+              "date": "2026-09-01",
+              "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
+              "id": 1,
+              "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
+              "labels": [
+                {
+                  "color": "#8e24aa",
+                  "id": 2,
+                  "name": "Ünnepségek"
+                },
+                {
+                  "color": "#1e88e5",
+                  "id": 1,
+                  "name": "Hírek"
+                }
+              ],
+              "title": "Tanévnyitó ünnepség"
+            }
+          },
+          {
+            "node": {
+              "author": {
+                "id": 1,
+                "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+                "name": "Kovács Anna"
+              },
+              "color": "#fb8c00",
+              "date": "2026-07-10",
+              "description": null,
+              "id": 3,
+              "indexImage": "https://storage.test/posts_images/tabor.jpg",
+              "labels": [],
+              "title": "Nyári tábor beszámoló"
+            }
+          }
+        ],
+        "pageInfo": {
+          "endCursor": "2026-07-10#3",
+          "hasPreviousPage": true
+        }
+      }
+    }
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 21,
+      "depth": 6
+    }
+  }
+}

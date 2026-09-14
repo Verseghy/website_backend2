@@ -1,0 +1,16 @@
+# Copied from website_frontend2 src/data/information.data.ts: QUERY_INFORMATION_MENU.
+
+query InformationMenu {
+  menu {
+    name
+    type
+    link
+    slug
+    children {
+      name
+      type
+      link
+      slug
+    }
+  }
+}

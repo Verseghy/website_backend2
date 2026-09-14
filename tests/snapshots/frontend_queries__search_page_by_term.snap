@@ -1,0 +1,67 @@
+---
+source: tests/frontend_queries.rs
+expression: response
+---
+{
+  "data": {
+    "search": {
+      "edges": [
+        {
+          "node": {
+            "author": {
+              "id": 1,
+              "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+              "name": "Kovács Anna"
+            },
+            "color": "#1e88e5",
+            "date": "2026-09-01",
+            "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
+            "id": 1,
+            "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
+            "labels": [
+              {
+                "color": "#8e24aa",
+                "id": 2,
+                "name": "Ünnepségek"
+              },
+              {
+                "color": "#1e88e5",
+                "id": 1,
+                "name": "Hírek"
+              }
+            ],
+            "title": "Tanévnyitó ünnepség"
+          }
+        },
+        {
+          "node": {
+            "author": null,
+            "color": "#e53935",
+            "date": "2025-12-19",
+            "description": "Az iskolakórus ünnepi hangversenye.",
+            "id": 5,
+            "indexImage": "https://storage.test/posts_images/koncert.jpg",
+            "labels": [
+              {
+                "color": "#8e24aa",
+                "id": 2,
+                "name": "Ünnepségek"
+              }
+            ],
+            "title": "Karácsonyi koncert"
+          }
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "2025-12-19#5",
+        "hasPreviousPage": false
+      }
+    }
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 20,
+      "depth": 5
+    }
+  }
+}

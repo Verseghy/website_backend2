@@ -8,7 +8,7 @@
 //! [`AppState::new`]; tests do the same with their own databases and caches.
 
 pub mod database;
-mod entity;
+pub mod entity;
 pub mod graphql;
 mod http;
 mod utils;

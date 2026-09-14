@@ -1,0 +1,61 @@
+---
+source: tests/frontend_queries.rs
+expression: response
+---
+{
+  "data": {
+    "week1": [
+      {
+        "date": "2025-12-29",
+        "menus": [
+          {
+            "menu": "Zöldségleves",
+            "type": 0
+          },
+          {
+            "menu": "Paprikás krumpli",
+            "type": 1
+          },
+          {
+            "menu": "Túrós palacsinta",
+            "type": 2
+          }
+        ]
+      },
+      {
+        "date": "2026-01-02",
+        "menus": [
+          {
+            "menu": "Gulyásleves",
+            "type": 0
+          },
+          {
+            "menu": "Paprikás krumpli",
+            "type": 1
+          }
+        ]
+      }
+    ],
+    "week2": [
+      {
+        "date": "2026-01-05",
+        "menus": [
+          {
+            "menu": "Zöldségleves",
+            "type": 0
+          },
+          {
+            "menu": "Rántott csirke rizzsel",
+            "type": 1
+          }
+        ]
+      }
+    ]
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 10,
+      "depth": 3
+    }
+  }
+}

@@ -6,9 +6,10 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "canteen_menus")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: u32,
+    #[sea_orm(column_type = "String(StringLen::N(191))")]
     pub menu: String,
-    pub r#type: i16,
+    pub r#type: u16,
     pub created_at: DateTime,
     pub updated_at: DateTime,
 }

@@ -1,5 +1,8 @@
-version: '3'
-
+# Local services for development and for the integration tests.
+#
+# Images follow production (website_k8s: verseghy-website/mysql and
+# verseghy-website/backend2-redis). The integration tests connect to these
+# ports as root by default; see docs/testing.md.
 services:
   database:
     image: docker.io/mysql:8
@@ -8,8 +11,18 @@ services:
       - "MYSQL_USER=backend"
       - "MYSQL_PASSWORD=password"
       - "MYSQL_ROOT_PASSWORD=secret"
+    # Every integration test opens its own small connection pool, and many run
+    # in parallel.
+    command: ["--max-connections=500"]
     ports:
         - "33061:3306"
+    healthcheck:
+      # Ping over TCP: during first-time initialisation the image runs a
+      # temporary server without networking, which would answer a socket ping.
+      test: ["CMD", "mysqladmin", "ping", "--host=127.0.0.1", "--user=root", "--password=secret"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
   redis:
     image: docker.io/redis:6.2-alpine
     environment:
@@ -18,3 +31,8 @@ services:
       - "6379:6379"
     command:
       - "redis-server"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 30

@@ -1,0 +1,59 @@
+---
+source: tests/content.rs
+expression: response
+---
+{
+  "data": {
+    "menu": [
+      {
+        "children": [
+          {
+            "children": [],
+            "link": null,
+            "name": "Rólunk",
+            "slug": "rolunk",
+            "type": "page_link"
+          },
+          {
+            "children": [],
+            "link": null,
+            "name": "Régi oldal",
+            "slug": "regi-oldal",
+            "type": "page_link"
+          }
+        ],
+        "link": "/informaciok",
+        "name": "Iskolánk",
+        "slug": null,
+        "type": "internal_link"
+      },
+      {
+        "children": [],
+        "link": null,
+        "name": "Kapcsolat",
+        "slug": "kapcsolat",
+        "type": "page_link"
+      },
+      {
+        "children": [],
+        "link": "https://example.test/e-naplo",
+        "name": "E-napló",
+        "slug": null,
+        "type": "external_link"
+      },
+      {
+        "children": [],
+        "link": "https://example.test/torolt",
+        "name": "Törölt menüpont",
+        "slug": null,
+        "type": "external_link"
+      }
+    ]
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 12,
+      "depth": 4
+    }
+  }
+}

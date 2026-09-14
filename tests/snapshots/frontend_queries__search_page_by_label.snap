@@ -1,0 +1,73 @@
+---
+source: tests/frontend_queries.rs
+expression: response
+---
+{
+  "data": {
+    "label": {
+      "posts": {
+        "edges": [
+          {
+            "node": {
+              "author": {
+                "id": 1,
+                "image": "https://storage.test/authors_images/kovacs-anna.jpg",
+                "name": "Kovács Anna"
+              },
+              "color": "#1e88e5",
+              "date": "2026-09-01",
+              "description": "Ünnepélyesen megnyitottuk a 2026/2027-es tanévet.",
+              "id": 1,
+              "indexImage": "https://storage.test/posts_images/tanevnyito.jpg",
+              "labels": [
+                {
+                  "color": "#8e24aa",
+                  "id": 2,
+                  "name": "Ünnepségek"
+                },
+                {
+                  "color": "#1e88e5",
+                  "id": 1,
+                  "name": "Hírek"
+                }
+              ],
+              "title": "Tanévnyitó ünnepség"
+            }
+          },
+          {
+            "node": {
+              "author": {
+                "id": 2,
+                "image": null,
+                "name": "Nagy Béla"
+              },
+              "color": "#fdd835",
+              "date": "2026-02-13",
+              "description": "Utólag rögzített beszámoló.",
+              "id": 6,
+              "indexImage": "https://storage.test/posts_images/farsang.jpg",
+              "labels": [
+                {
+                  "color": "#1e88e5",
+                  "id": 1,
+                  "name": "Hírek"
+                }
+              ],
+              "title": "Farsangi bál"
+            }
+          }
+        ],
+        "pageInfo": {
+          "endCursor": "2026-02-13#6",
+          "hasPreviousPage": true
+        }
+      }
+    }
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 21,
+      "depth": 6
+    }
+  }
+}

@@ -1,0 +1,53 @@
+---
+source: tests/calendar.rs
+expression: response
+---
+{
+  "data": {
+    "canteen": [
+      {
+        "date": "2025-12-29",
+        "id": 2,
+        "menus": [
+          {
+            "id": 4,
+            "menu": "Zöldségleves",
+            "type": 0
+          },
+          {
+            "id": 5,
+            "menu": "Paprikás krumpli",
+            "type": 1
+          },
+          {
+            "id": 3,
+            "menu": "Túrós palacsinta",
+            "type": 2
+          }
+        ]
+      },
+      {
+        "date": "2026-01-02",
+        "id": 3,
+        "menus": [
+          {
+            "id": 1,
+            "menu": "Gulyásleves",
+            "type": 0
+          },
+          {
+            "id": 5,
+            "menu": "Paprikás krumpli",
+            "type": 1
+          }
+        ]
+      }
+    ]
+  },
+  "extensions": {
+    "analyzer": {
+      "complexity": 7,
+      "depth": 3
+    }
+  }
+}
