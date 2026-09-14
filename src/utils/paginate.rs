@@ -62,9 +62,13 @@ enum QueryMinMax {
     Id,
 }
 
+/// `(date, id)` of the oldest and the newest published post, or `None` if no
+/// post is published.
+///
+/// * `db` - transaction of the current request.
 async fn get_published_posts_min_max_id(
     db: &DatabaseTransaction,
-) -> Result<((NaiveDate, u32), (NaiveDate, u32))> {
+) -> Result<Option<((NaiveDate, u32), (NaiveDate, u32))>> {
     let order_by = |order: Order| async move {
         PostsData::find()
             .select_only()
@@ -78,14 +82,10 @@ async fn get_published_posts_min_max_id(
             .await
             .map_err(db_error)
     };
-    let min = order_by(Order::Asc)
-        .await?
-        .ok_or_else(|| Error::new("Could not get min value"))?;
-    let max = order_by(Order::Desc)
-        .await?
-        .ok_or_else(|| Error::new("Could not get max value"))?;
+    let min = order_by(Order::Asc).await?;
+    let max = order_by(Order::Desc).await?;
 
-    Ok((min, max))
+    Ok(min.zip(max))
 }
 
 fn get_connection(
@@ -131,7 +131,7 @@ where
             let mut query = build_paginated_posts(after, before, first, last);
 
             select_columns_connection!(ctx, query, Column);
-            select_columns_connection!(ctx, query, 
+            select_columns_connection!(ctx, query,
                 "author" => Column::AuthorId,
                 "labels" => Column::Id);
 
@@ -149,9 +149,12 @@ where
 
             res.sort_by_key(|p| std::cmp::Reverse(p.date));
 
-            let (min, max) = get_published_posts_min_max_id(db).await?;
-
-            let mut connection = get_connection(&res, min, max)?;
+            // Without any published post, `res` is empty and there is nothing
+            // before or after it.
+            let mut connection = match get_published_posts_min_max_id(db).await? {
+                Some((min, max)) => get_connection(&res, min, max)?,
+                None => Connection::new(false, false),
+            };
 
             connection.edges.extend(res.into_iter().map(|post| {
                 let cursor = PostCursor::new(post.date.unwrap(), post.id.unwrap());
