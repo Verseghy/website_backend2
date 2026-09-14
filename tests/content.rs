@@ -31,7 +31,6 @@ async fn page_is_found_by_slug() {
 }
 
 #[tokio::test]
-#[ignore = "bug: soft-deleted pages are still served"]
 async fn soft_deleted_page_is_not_served() {
     let app = TestApp::seeded().await;
 

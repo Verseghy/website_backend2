@@ -45,6 +45,8 @@ impl PagesQuery {
 
         query
             .filter(Column::Slug.eq(slug))
+            // Pages are soft-deleted: a deleted page keeps its row but gets `deleted_at`.
+            .filter(Column::DeletedAt.is_null())
             .into_model::<Page>()
             .one(db.deref())
             .await
