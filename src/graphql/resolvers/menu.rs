@@ -58,7 +58,7 @@ impl MenuItem {
         select_columns!(ctx, query, Column);
         select_columns!(ctx, query,
             "link" => Column::Type,
-            "link" => Column::PageId,
+            "slug" => Column::PageId,
             "children" => Column::Id);
 
         query
@@ -91,7 +91,7 @@ impl MenuQuery {
         select_columns!(ctx, query, Column);
         select_columns!(ctx, query,
             "link" => Column::Type,
-            "link" => Column::PageId,
+            "slug" => Column::PageId,
             "children" => Column::Id);
 
         query

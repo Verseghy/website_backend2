@@ -59,20 +59,30 @@ async fn menu_is_a_tree_in_position_order() {
 }
 
 #[tokio::test]
-#[ignore = "bug: a menu item's slug is null unless its link is selected too"]
 async fn menu_slug_does_not_depend_on_selecting_link() {
-    // "Kapcsolat" links to the page with the slug "kapcsolat".
+    fn item<'a>(items: &'a Value, name: &str) -> &'a Value {
+        items
+            .as_array()
+            .expect("menu items")
+            .iter()
+            .find(|item| item["name"] == name)
+            .unwrap_or_else(|| panic!("no menu item {name:?} in {items:#}"))
+    }
+
+    // "Kapcsolat" links to the page "kapcsolat"; "Rólunk", a child of
+    // "Iskolánk", links to the page "rolunk".
     let app = TestApp::seeded().await;
 
-    let response = app.graphql("{ menu { name slug } }").await;
+    let response = app
+        .graphql("{ menu { name slug children { name slug } } }")
+        .await;
 
-    let contact = expect_data(&response)["menu"]
-        .as_array()
-        .expect("menu")
-        .iter()
-        .find(|item| item["name"] == "Kapcsolat")
-        .expect("seeded menu item");
-    assert_eq!(contact["slug"], "kapcsolat");
+    let menu = &expect_data(&response)["menu"];
+    assert_eq!(item(menu, "Kapcsolat")["slug"], "kapcsolat");
+    assert_eq!(
+        item(&item(menu, "Iskolánk")["children"], "Rólunk")["slug"],
+        "rolunk"
+    );
 }
 
 #[tokio::test]
