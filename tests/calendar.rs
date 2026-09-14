@@ -26,20 +26,29 @@ async fn canteen_week_without_menus_is_empty() {
 }
 
 #[tokio::test]
-#[ignore = "bug: a canteen week that does not exist panics and returns HTTP 500"]
 async fn nonexistent_canteen_week_is_a_graphql_error() {
     let app = TestApp::seeded().await;
 
-    let response = app
-        .post("/graphql")
-        .json(&json!({ "query": "{ canteen(year: 2026, week: 0) { date } }" }))
-        .send()
-        .await
-        .expect("request");
+    // 2026 has 53 ISO weeks (1 January is a Thursday); 2025 has only 52.
+    for (year, week) in [(2026, 0), (2026, -1), (2026, 54), (2025, 53)] {
+        let response = app
+            .post("/graphql")
+            .json(&json!({
+                "query": "query ($year: Int!, $week: Int!) { canteen(year: $year, week: $week) { date } }",
+                "variables": { "year": year, "week": week },
+            }))
+            .send()
+            .await
+            .expect("request");
 
-    assert_eq!(response.status(), StatusCode::OK);
-    let body: Value = response.json().await.expect("JSON body");
-    assert!(!error_messages(&body).is_empty(), "{body:#}");
+        assert_eq!(response.status(), StatusCode::OK, "{year}-W{week}");
+        let body: Value = response.json().await.expect("JSON body");
+        assert_eq!(
+            error_messages(&body),
+            ["invalid week"],
+            "{year}-W{week}: {body:#}"
+        );
+    }
 }
 
 #[tokio::test]

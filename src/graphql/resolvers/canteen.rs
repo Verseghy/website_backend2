@@ -9,7 +9,7 @@ use crate::{
     graphql::types::Date,
     utils::db_error,
 };
-use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
+use async_graphql::{ComplexObject, Context, Error, Object, Result, SimpleObject};
 use prometheus::{IntCounterVec, labels};
 use sea_orm::{
     DatabaseTransaction, FromQueryResult, JoinType,
@@ -86,7 +86,7 @@ impl CanteenQuery {
         select_columns!(ctx, query, canteen_data::Column);
         select_columns!(ctx, query, "menus" => canteen_data::Column::Id);
 
-        let (start, end) = iso_week_range(year, week).unwrap();
+        let (start, end) = iso_week_range(year, week).ok_or_else(|| Error::new("invalid week"))?;
 
         query
             .filter(canteen_data::Column::Date.lte(end))
