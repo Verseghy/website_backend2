@@ -30,9 +30,8 @@ pub fn month_range(year: i32, month: u32) -> Option<(NaiveDateTime, NaiveDateTim
 ///
 /// The view is a grid of Monday-to-Sunday weeks, so it also shows days of the
 /// neighbouring months. `start` is midnight on the Monday of the week containing
-/// the 1st of the month. `end` is meant to be midnight after the Sunday of the
-/// week containing the last day of the month; it currently is not, see the
-/// ignored test `calendar_grid_ends_after_the_sunday_of_the_last_week`.
+/// the 1st of the month, and `end` is midnight after the Sunday of the week
+/// containing the last day of the month.
 ///
 /// * `year` - calendar year.
 /// * `month` - month number, 1 to 12.
@@ -42,8 +41,10 @@ pub fn calendar_grid_range(year: i32, month: u32) -> Option<(NaiveDateTime, Naiv
     let (month_start, next_month_start) = month_range(year, month)?;
 
     let start = month_start - Duration::days(month_start.weekday().num_days_from_monday().into());
-    let end = next_month_start
-        + Duration::days((6 - next_month_start.weekday().num_days_from_monday()).into());
+    // The grid ends at the first Monday on or after the next month's 1st: the
+    // last row ends on the Sunday before it.
+    let days_to_monday = (7 - next_month_start.weekday().num_days_from_monday()) % 7;
+    let end = next_month_start + Duration::days(days_to_monday.into());
 
     Some((start, end))
 }
@@ -132,7 +133,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "bug: calendar grid end drops the last Sunday, or adds a spare week when the next month starts on a Monday"]
     fn calendar_grid_ends_after_the_sunday_of_the_last_week() {
         // 30 September 2026 is a Wednesday; its week ends on Sunday 4 October.
         assert_eq!(
@@ -208,7 +208,6 @@ mod tests {
         }
 
         #[test]
-        #[ignore = "bug: calendar grid end drops the last Sunday, or adds a spare week when the next month starts on a Monday"]
         fn calendar_grid_covers_whole_weeks_through_the_month_end(
             year in 1..=9999i32,
             month in 1..=12u32,

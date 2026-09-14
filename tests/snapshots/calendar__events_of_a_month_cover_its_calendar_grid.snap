@@ -28,6 +28,14 @@ expression: response
         "description": null,
         "id": 4,
         "title": "Témahét"
+      },
+      {
+        "color": "#8e24aa",
+        "dateFrom": "2026-10-04 09:00:00",
+        "dateTo": "2026-10-04 12:00:00",
+        "description": "Leendő kilencedikeseknek",
+        "id": 5,
+        "title": "Nyílt nap"
       }
     ]
   },
