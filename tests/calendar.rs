@@ -55,7 +55,6 @@ async fn events_of_a_month_cover_its_calendar_grid() {
 }
 
 #[tokio::test]
-#[ignore = "bug: calendar grid end drops the last Sunday, or adds a spare week when the next month starts on a Monday"]
 async fn events_include_the_last_day_of_the_calendar_grid() {
     let app = TestApp::seeded().await;
 
