@@ -36,15 +36,17 @@ pub fn month_range(year: i32, month: u32) -> Option<(NaiveDateTime, NaiveDateTim
 /// * `year` - calendar year.
 /// * `month` - month number, 1 to 12.
 ///
-/// Returns `None` under the same conditions as [`month_range`].
+/// Returns `None` under the same conditions as [`month_range`], and when the
+/// grid would reach past the earliest or latest date chrono can represent.
 pub fn calendar_grid_range(year: i32, month: u32) -> Option<(NaiveDateTime, NaiveDateTime)> {
     let (month_start, next_month_start) = month_range(year, month)?;
 
-    let start = month_start - Duration::days(month_start.weekday().num_days_from_monday().into());
+    let days_since_monday = month_start.weekday().num_days_from_monday();
+    let start = month_start.checked_sub_signed(Duration::days(days_since_monday.into()))?;
     // The grid ends at the first Monday on or after the next month's 1st: the
     // last row ends on the Sunday before it.
     let days_to_monday = (7 - next_month_start.weekday().num_days_from_monday()) % 7;
-    let end = next_month_start + Duration::days(days_to_monday.into());
+    let end = next_month_start.checked_add_signed(Duration::days(days_to_monday.into()))?;
 
     Some((start, end))
 }
@@ -153,7 +155,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "bug: calendar grid start overflows and panics for the earliest month chrono can represent"]
     fn calendar_grid_does_not_panic_at_the_earliest_representable_month() {
         let _ = calendar_grid_range(NaiveDate::MIN.year(), 1);
     }
@@ -234,15 +235,14 @@ mod tests {
             prop_assert_eq!(i64::from(monday.iso_week().week()), i64::from(week));
         }
 
-        // `calendar_grid_range` is left out until it stops panicking at the
-        // earliest representable month (see the ignored test above).
         #[test]
-        fn month_and_week_ranges_never_panic(
+        fn date_ranges_never_panic(
             year in prop_oneof![any::<i32>(), NaiveDate::MIN.year()..=NaiveDate::MAX.year()],
             month in prop_oneof![any::<u32>(), 0..=13u32],
             week in prop_oneof![any::<i32>(), -1..=54i32],
         ) {
             let _ = month_range(year, month);
+            let _ = calendar_grid_range(year, month);
             let _ = iso_week_range(year, week);
         }
     }
