@@ -3,6 +3,9 @@ use chrono::{DateTime as ChronoDateTime, NaiveDateTime};
 use core::str::FromStr;
 use sea_orm::{QueryResult, TryGetError, TryGetable};
 
+/// The documented format, which `to_value` emits.
+const FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+
 /// A date with time information. Format: YYYY-MM-DD HH:MM:SS (e.g., "2024-01-15 14:30:00").
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Description)]
 pub struct DateTime(pub NaiveDateTime);
@@ -14,17 +17,16 @@ impl ScalarType for DateTime {
             return Err(InputValueError::expected_type(value));
         };
 
-        let date = NaiveDateTime::from_str(&value);
-
-        if let Ok(date) = date {
-            Ok(DateTime(date))
-        } else {
-            Err(InputValueError::custom("Wrong date format"))
-        }
+        // ISO 8601 with a `T` separator was the only accepted input before,
+        // so keep accepting it.
+        NaiveDateTime::parse_from_str(&value, FORMAT)
+            .or_else(|_| NaiveDateTime::from_str(&value))
+            .map(DateTime)
+            .map_err(|_| InputValueError::custom("Wrong date format"))
     }
 
     fn to_value(&self) -> Value {
-        Value::String(self.0.format("%Y-%m-%d %H:%M:%S").to_string())
+        Value::String(self.0.format(FORMAT).to_string())
     }
 }
 
@@ -83,7 +85,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "bug: DateTime rejects the \"YYYY-MM-DD HH:MM:SS\" format it documents and emits"]
     fn parses_the_format_it_emits() {
         let value = datetime(2024, 1, 15, 14, 30, 5);
 
