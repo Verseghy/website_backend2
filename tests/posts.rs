@@ -210,10 +210,17 @@ async fn author_and_label_post_lists_are_filtered() {
     );
 }
 
-#[tokio::test]
-#[ignore = "bug: cursor pagination skips posts with a higher id than the cursor's post but an older date"]
-async fn paging_through_posts_visits_every_published_post_once() {
-    let app = TestApp::seeded().await;
+/// Pages through all published posts two at a time and returns their ids in
+/// the order they were listed.
+///
+/// * `app` - the app to query.
+///
+/// Follows `endCursor` while `hasPreviousPage` is true, which in this API means
+/// "older posts exist".
+async fn page_through_posts(app: &TestApp) -> Vec<u32> {
+    // More pages than any test's data needs, so a cursor that never advances
+    // fails the test instead of hanging it.
+    const MAX_PAGES: usize = 20;
     let query = "query ($after: String) {
         posts(first: 2, after: $after) {
             edges { node { id } }
@@ -223,19 +230,63 @@ async fn paging_through_posts_visits_every_published_post_once() {
 
     let mut seen = Vec::new();
     let mut after = Value::Null;
-    for _ in 0..seed::PUBLISHED_POSTS_NEWEST_FIRST.len() {
+    for _ in 0..MAX_PAGES {
         let response = app.graphql_with(query, json!({ "after": after })).await;
         let posts = &expect_data(&response)["posts"];
         seen.extend(node_ids(posts));
 
-        // In this API `hasPreviousPage` means "older posts exist".
         if posts["pageInfo"]["hasPreviousPage"] != true {
-            break;
+            return seen;
         }
         after = posts["pageInfo"]["endCursor"].clone();
     }
 
-    assert_eq!(seen, seed::PUBLISHED_POSTS_NEWEST_FIRST);
+    panic!("paging did not finish within {MAX_PAGES} pages: {seen:?}");
+}
+
+#[tokio::test]
+async fn paging_through_posts_visits_every_published_post_once() {
+    let app = TestApp::seeded().await;
+
+    assert_eq!(
+        page_through_posts(&app).await,
+        seed::PUBLISHED_POSTS_NEWEST_FIRST
+    );
+}
+
+#[tokio::test]
+async fn paging_orders_posts_with_the_same_date_by_descending_id() {
+    use chrono::NaiveDate;
+    use sea_orm::{ActiveValue::Set, EntityTrait};
+    use website_backend2::entity::posts_data;
+
+    let app = TestApp::seeded().await;
+    // Posts 7 and 8 share post 2's date, so a page boundary falls between
+    // posts with the same date.
+    let date = NaiveDate::from_ymd_opt(2026, 8, 20).expect("valid date");
+    let created = date.and_hms_opt(0, 0, 0).expect("valid time");
+    let post_on_that_date = |id: u32| posts_data::ActiveModel {
+        id: Set(id),
+        title: Set(format!("Post {id}")),
+        color: Set("#000000".to_owned()),
+        description: Set(None),
+        content: Set(None),
+        index_image: Set(None),
+        author_id: Set(None),
+        images: Set(json!([])),
+        date: Set(Some(date)),
+        created_at: Set(created),
+        updated_at: Set(created),
+        featured: Set(0),
+        published: Set(1),
+        preview_token: Set(None),
+    };
+    posts_data::Entity::insert_many([post_on_that_date(7), post_on_that_date(8)])
+        .exec_without_returning(app.db())
+        .await
+        .expect("insert posts");
+
+    assert_eq!(page_through_posts(&app).await, [1, 8, 7, 2, 3, 6, 5]);
 }
 
 #[tokio::test]
