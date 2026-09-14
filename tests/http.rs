@@ -148,7 +148,6 @@ async fn operation_named_introspection_query_can_select_data() {
 }
 
 #[tokio::test]
-#[ignore = "bug: trailing slashes are trimmed after routing, so /graphql/ is not found"]
 async fn trailing_slash_is_ignored() {
     let app = TestApp::seeded().await;
 
@@ -160,4 +159,12 @@ async fn trailing_slash_is_ignored() {
         .expect("request");
 
     assert_eq!(response.status(), StatusCode::OK);
+    let body: Value = response.json().await.expect("JSON body");
+    expect_data(&body);
+
+    for path in ["/liveness/", "/readiness/", "/graphql/"] {
+        let response = app.get(path).send().await.expect("request");
+
+        assert_eq!(response.status(), StatusCode::OK, "GET {path}");
+    }
 }

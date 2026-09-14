@@ -14,14 +14,18 @@ mod http;
 mod utils;
 
 use crate::{graphql::Schema, utils::SignalHandler};
-use axum::Router;
+use axum::{Router, ServiceExt, extract::Request, routing::IntoMakeService};
 use envconfig::Envconfig;
 use prometheus::{IntCounterVec, Opts, Registry};
 use sea_orm::DatabaseConnection;
 use std::net::IpAddr;
 use tokio::net::TcpListener;
-use tower::ServiceBuilder;
-use tower_http::{ServiceBuilderExt, cors::CorsLayer};
+use tower::{Layer, ServiceBuilder};
+use tower_http::{
+    ServiceBuilderExt,
+    cors::CorsLayer,
+    normalize_path::{NormalizePath, NormalizePathLayer},
+};
 
 /// Runtime configuration.
 ///
@@ -102,20 +106,28 @@ fn middlewares(router: Router) -> Router {
         .compression()
         .decompression()
         .layer(CorsLayer::permissive())
-        .trim_trailing_slash()
         .into_inner();
 
     router.layer(middlewares)
 }
 
-/// Builds the complete HTTP application: routes, handler state and middleware.
+/// Builds the complete HTTP application: routes, handler state and middleware,
+/// ready to pass to [`axum::serve`].
 ///
 /// * `state` - handler state, see [`AppState::new`].
 ///
 /// This is exactly what [`run`] serves, so requests sent to it exercise routing
 /// and middleware as well as the GraphQL layer.
-pub fn app(state: AppState) -> Router {
-    middlewares(http::routes().with_state(state))
+pub fn app(state: AppState) -> IntoMakeService<NormalizePath<Router>> {
+    let router = middlewares(http::routes().with_state(state));
+
+    // Trailing slashes have to be trimmed before routing, but middleware added
+    // with `Router::layer` only runs after a route has matched. The layer
+    // therefore wraps the whole router, as axum's documentation on rewriting
+    // the request URI in middleware recommends.
+    let app = NormalizePathLayer::trim_trailing_slash().layer(router);
+
+    ServiceExt::<Request>::into_make_service(app)
 }
 
 /// Serves the application until SIGINT, SIGTERM or SIGQUIT is received.
