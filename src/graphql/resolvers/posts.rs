@@ -64,31 +64,10 @@ impl Post {
     async fn images(&self, ctx: &Context<'_>) -> Result<Vec<String>> {
         let config = ctx.data_unchecked::<Config>();
 
-        match &*self.images {
-            Some(Json::Array(arr)) => Ok(arr
-                .iter()
-                .filter(|elem| elem.is_string())
-                .map(|elem| {
-                    format!(
-                        "{}/posts_images/{}",
-                        config.storage_base_url,
-                        elem.as_str().unwrap()
-                    )
-                })
-                .collect()),
-            Some(Json::Object(map)) => Ok(map
-                .values()
-                .filter(|elem| elem.is_string())
-                .map(|elem| {
-                    format!(
-                        "{}/posts_images/{}",
-                        config.storage_base_url,
-                        elem.as_str().unwrap()
-                    )
-                })
-                .collect()),
-            _ => Err(Error::new("invalid data in database")),
-        }
+        self.images
+            .as_ref()
+            .and_then(|images| image_urls(&config.storage_base_url, images))
+            .ok_or_else(|| Error::new("invalid data in database"))
     }
 
     /// The author of this post.
@@ -228,5 +207,84 @@ impl PostsQuery {
             .one(db.deref())
             .await
             .map_err(db_error)
+    }
+}
+
+/// Builds public URLs for the file names stored in a post's `images` column.
+///
+/// The column holds either a JSON array of file names or a JSON object whose
+/// values are file names; entries that are not strings are skipped.
+///
+/// * `storage_base_url` - base URL uploaded files are served from, see
+///   [`Config::storage_base_url`].
+/// * `images` - raw JSON value of the column.
+///
+/// Returns `None` if the value is neither an array nor an object.
+fn image_urls(storage_base_url: &str, images: &Json) -> Option<Vec<String>> {
+    let files: Box<dyn Iterator<Item = &Json>> = match images {
+        Json::Array(array) => Box::new(array.iter()),
+        Json::Object(map) => Box::new(map.values()),
+        _ => return None,
+    };
+
+    Some(
+        files
+            .filter_map(Json::as_str)
+            .map(|file| format!("{storage_base_url}/posts_images/{file}"))
+            .collect(),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    const BASE: &str = "https://example.test/storage";
+
+    #[test]
+    fn array_entries_become_urls() {
+        assert_eq!(
+            image_urls(BASE, &json!(["a.jpg", "b.png"])),
+            Some(vec![
+                format!("{BASE}/posts_images/a.jpg"),
+                format!("{BASE}/posts_images/b.png"),
+            ])
+        );
+    }
+
+    #[test]
+    fn object_values_become_urls_in_stored_order() {
+        assert_eq!(
+            image_urls(BASE, &json!({"2": "b.jpg", "1": "a.jpg"})),
+            Some(vec![
+                format!("{BASE}/posts_images/b.jpg"),
+                format!("{BASE}/posts_images/a.jpg"),
+            ])
+        );
+    }
+
+    #[test]
+    fn entries_that_are_not_strings_are_skipped() {
+        assert_eq!(
+            image_urls(BASE, &json!(["a.jpg", 1, null, {"file": "x.jpg"}, "b.jpg"])),
+            Some(vec![
+                format!("{BASE}/posts_images/a.jpg"),
+                format!("{BASE}/posts_images/b.jpg"),
+            ])
+        );
+    }
+
+    #[test]
+    fn empty_collections_have_no_urls() {
+        assert_eq!(image_urls(BASE, &json!([])), Some(vec![]));
+        assert_eq!(image_urls(BASE, &json!({})), Some(vec![]));
+    }
+
+    #[test]
+    fn values_that_are_not_collections_are_invalid() {
+        for images in [json!(null), json!("a.jpg"), json!(1), json!(true)] {
+            assert_eq!(image_urls(BASE, &images), None, "{images}");
+        }
     }
 }

@@ -1,0 +1,506 @@
+---
+source: src/graphql/mod.rs
+expression: schema.sdl()
+---
+type Archive {
+	"""
+	Retrieve posts from a specific year and month.
+	"""
+	posts(
+		"""
+		The year.
+		"""
+		year: Int!,
+		"""
+		The month (1-12).
+		"""
+		month: Int!
+	): [Post!]!
+	"""
+	Get a summary of post counts grouped by year and month.
+	
+	Returns entries sorted by date in descending order (newest first).
+	"""
+	info: [Info!]!
+}
+
+"""
+A post author.
+"""
+type Author {
+	"""
+	Unique identifier.
+	"""
+	id: Int!
+	"""
+	Author's full name.
+	"""
+	name: String!
+	"""
+	Author biography or description.
+	"""
+	description: String
+	"""
+	Profile image URL.
+	"""
+	image: String
+	"""
+	Paginated list of posts written by this author.
+	
+	Use `featured: true` to filter only featured posts.
+	"""
+	posts(
+		"""
+		Filter to only featured posts.
+		"""
+		featured: Boolean! = false,		after: String,		before: String,		first: Int,		last: Int
+	): PostConnection!
+}
+
+"""
+A day's canteen information.
+"""
+type Canteen {
+	"""
+	Unique identifier.
+	"""
+	id: Int!
+	"""
+	The date for this canteen menu.
+	"""
+	date: Date!
+	"""
+	Available menu items for this day.
+	"""
+	menus: [Menu!]!
+}
+
+"""
+A staff member or colleague.
+"""
+type Colleague {
+	"""
+	Unique identifier.
+	"""
+	id: Int!
+	"""
+	Full name (may include title like "Dr.").
+	"""
+	name: String!
+	"""
+	Job titles or positions.
+	"""
+	jobs: String
+	"""
+	Teaching subjects.
+	"""
+	subjects: String
+	"""
+	Additional roles or responsibilities.
+	"""
+	roles: String
+	"""
+	Awards and recognitions.
+	"""
+	awards: String
+	"""
+	Category identifier for grouping colleagues.
+	"""
+	category: Int!
+	"""
+	Profile image URL.
+	"""
+	image: String
+}
+
+"""
+A date without time information. Format: YYYY-MM-DD (e.g., "2024-01-15").
+"""
+scalar Date
+
+"""
+A date with time information. Format: YYYY-MM-DD HH:MM:SS (e.g., "2024-01-15 14:30:00").
+"""
+scalar DateTime
+
+"""
+A calendar event.
+"""
+type Event {
+	"""
+	Unique identifier.
+	"""
+	id: Int!
+	"""
+	Event start date and time.
+	"""
+	dateFrom: DateTime!
+	"""
+	Event end date and time.
+	"""
+	dateTo: DateTime!
+	"""
+	Event title.
+	"""
+	title: String!
+	"""
+	Event description.
+	"""
+	description: String
+	"""
+	Display color for the event.
+	"""
+	color: String
+}
+
+"""
+Summary information about posts in a specific month.
+"""
+type Info {
+	"""
+	Number of posts in this month.
+	"""
+	count: Int!
+	"""
+	Year.
+	"""
+	year: Int!
+	"""
+	Month (1-12).
+	"""
+	month: Int!
+}
+
+"""
+A scalar that can represent any JSON value.
+"""
+scalar JSON
+
+"""
+A category label for posts.
+"""
+type Label {
+	"""
+	Unique identifier.
+	"""
+	id: Int!
+	"""
+	Label name.
+	"""
+	name: String!
+	"""
+	Display color (hex or named color).
+	"""
+	color: String!
+	"""
+	Paginated list of posts with this label.
+	
+	Use `featured: true` to filter only featured posts.
+	"""
+	posts(
+		"""
+		Filter to only featured posts.
+		"""
+		featured: Boolean! = false,		after: String,		before: String,		first: Int,		last: Int
+	): PostConnection!
+}
+
+"""
+A canteen menu item.
+"""
+type Menu {
+	"""
+	Unique identifier.
+	"""
+	id: Int!
+	"""
+	Menu item description.
+	"""
+	menu: String!
+	"""
+	Menu type identifier (e.g., main course, soup, dessert).
+	"""
+	type: Int!
+}
+
+"""
+A navigation menu item.
+"""
+type MenuItem {
+	"""
+	Display name of the menu item.
+	"""
+	name: String!
+	"""
+	Item type (e.g., "page", "link", "separator").
+	"""
+	type: String!
+	"""
+	External URL for link-type items.
+	"""
+	link: String
+	"""
+	Page slug for page-type items (used to construct internal links).
+	"""
+	slug: String
+	"""
+	Nested child menu items (for dropdown menus).
+	"""
+	children: [MenuItem!]!
+}
+
+"""
+A static page.
+"""
+type Page {
+	"""
+	Unique identifier.
+	"""
+	id: Int!
+	"""
+	Template name used to render this page.
+	"""
+	template: String!
+	"""
+	Internal page name.
+	"""
+	name: String!
+	"""
+	Page title for display.
+	"""
+	title: String!
+	"""
+	Page content (HTML or markdown).
+	"""
+	content: String!
+	"""
+	Additional structured data as JSON.
+	"""
+	extras: JSON!
+}
+
+"""
+Information about pagination in a connection
+"""
+type PageInfo {
+	"""
+	When paginating backwards, are there more items?
+	"""
+	hasPreviousPage: Boolean!
+	"""
+	When paginating forwards, are there more items?
+	"""
+	hasNextPage: Boolean!
+	"""
+	When paginating backwards, the cursor to continue.
+	"""
+	startCursor: String
+	"""
+	When paginating forwards, the cursor to continue.
+	"""
+	endCursor: String
+}
+
+"""
+A blog post or article.
+"""
+type Post {
+	"""
+	Unique identifier.
+	"""
+	id: Int!
+	"""
+	Post title.
+	"""
+	title: String!
+	"""
+	Theme color for display.
+	"""
+	color: String!
+	"""
+	Short description or excerpt.
+	"""
+	description: String
+	"""
+	Full post content.
+	"""
+	content: String!
+	"""
+	Publication date.
+	"""
+	date: Date!
+	"""
+	Main image URL for the post.
+	"""
+	indexImage: String!
+	"""
+	Additional image URLs associated with the post.
+	"""
+	images: [String!]!
+	"""
+	The author of this post.
+	"""
+	author: Author
+	"""
+	Labels/categories associated with this post.
+	"""
+	labels: [Label!]!
+}
+
+type PostConnection {
+	"""
+	Information to aid in pagination.
+	"""
+	pageInfo: PageInfo!
+	"""
+	A list of edges.
+	"""
+	edges: [PostEdge!]!
+	"""
+	A list of nodes.
+	"""
+	nodes: [Post!]!
+}
+
+"""
+An edge in a connection.
+"""
+type PostEdge {
+	"""
+	The item at the end of the edge
+	"""
+	node: Post!
+	"""
+	A cursor for use in pagination
+	"""
+	cursor: String!
+}
+
+"""
+Root query type, merged from the per-resource query objects.
+"""
+type Query {
+	"""
+	Retrieve canteen menus for a specific ISO week.
+	
+	Returns canteen data for each day of the specified week (Monday through Sunday).
+	"""
+	canteen(
+		"""
+		The ISO year.
+		"""
+		year: Int!,
+		"""
+		The ISO week number (1-53).
+		"""
+		week: Int!
+	): [Canteen!]!
+	"""
+	Retrieve all colleagues, sorted alphabetically by name.
+	
+	Names with "Dr." prefix are sorted by the name portion (ignoring the title).
+	"""
+	colleagues: [Colleague!]!
+	"""
+	Retrieve events for a specific month.
+	
+	Returns events that overlap with the calendar view of the specified month
+	(including days from adjacent weeks that appear in the month's calendar grid).
+	"""
+	events(
+		"""
+		The year.
+		"""
+		year: Int!,
+		"""
+		The month (1-12).
+		"""
+		month: Int!
+	): [Event!]!
+	"""
+	Retrieve a page by its URL slug.
+	"""
+	page(
+		"""
+		The page's URL slug (e.g., "about", "contact").
+		"""
+		slug: String!
+	): Page
+	"""
+	Retrieve an author by their ID.
+	"""
+	author(
+		"""
+		The author's unique identifier.
+		"""
+		id: Int!
+	): Author
+	"""
+	Retrieve a paginated list of published posts.
+	
+	Use `featured: true` to filter only featured posts.
+	Supports cursor-based pagination with `after`, `before`, `first`, and `last` arguments.
+	"""
+	posts(featured: Boolean! = false, after: String, before: String, first: Int, last: Int): PostConnection!
+	"""
+	Search posts by title, description, or content.
+	
+	Returns a paginated list of posts matching the search term.
+	"""
+	search(
+		"""
+		The search term to match against post title, description, and content.
+		"""
+		term: String!,		after: String,		before: String,		first: Int,		last: Int
+	): PostConnection!
+	"""
+	Retrieve a single post by ID.
+	
+	For published posts, only the `id` is required.
+	For unpublished posts, a valid `token` (preview token) must be provided.
+	"""
+	post(
+		"""
+		The post ID.
+		"""
+		id: Int!,
+		"""
+		Preview token for accessing unpublished posts.
+		"""
+		token: String
+	): Post
+	"""
+	Retrieve a label by its ID.
+	"""
+	label(
+		"""
+		The label's unique identifier.
+		"""
+		id: Int!
+	): Label
+	"""
+	Retrieve the navigation menu structure.
+	
+	Returns top-level menu items. Use the `children` field to access nested items.
+	"""
+	menu: [MenuItem!]!
+	"""
+	Access the post archive.
+	
+	Use `posts(year, month)` to retrieve posts from a specific month,
+	or `info` to get a summary of all available months.
+	"""
+	archive: Archive!
+}
+
+"""
+Directs the executor to include this field or fragment only when the `if` argument is true.
+"""
+directive @include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+"""
+Directs the executor to skip this field or fragment when the `if` argument is true.
+"""
+directive @skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+schema {
+	query: Query
+}

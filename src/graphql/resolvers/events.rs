@@ -2,10 +2,9 @@ use crate::{
     entity::events_data::{Column, Entity as EventsData},
     graphql::types::DateTime,
     select_columns,
-    utils::{Maybe, db_error},
+    utils::{Maybe, calendar_grid_range, db_error},
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
-use chrono::{Datelike, Duration, NaiveDate};
 use prometheus::{IntCounterVec, labels};
 use sea_orm::{
     DatabaseTransaction, FromQueryResult,
@@ -55,27 +54,8 @@ impl EventsQuery {
 
         select_columns!(ctx, query, Column);
 
-        let start = {
-            let start = NaiveDate::from_ymd_opt(year, month, 1)
-                .ok_or_else(|| Error::new("invalid date"))?
-                .and_hms_opt(0, 0, 0)
-                .unwrap();
-
-            start - Duration::days(start.weekday().num_days_from_monday().into())
-        };
-
-        let end = {
-            let end = if month < 12 {
-                NaiveDate::from_ymd_opt(year, month + 1, 1)
-            } else {
-                NaiveDate::from_ymd_opt(year + 1, 1, 1)
-            }
-            .ok_or_else(|| Error::new("invalid date"))?
-            .and_hms_opt(0, 0, 0)
-            .unwrap();
-
-            end + Duration::days((6 - end.weekday().num_days_from_monday()).into())
-        };
+        let (start, end) =
+            calendar_grid_range(year, month).ok_or_else(|| Error::new("invalid date"))?;
 
         query
             .filter(Column::DateTo.gte(start))

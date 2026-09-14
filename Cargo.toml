@@ -24,3 +24,7 @@ tower = "0.5.3"
 envconfig = "0.11.1"
 icu_collator = "2.3.1"
 icu_locale_core = "2.3.0"
+
+[dev-dependencies]
+insta = "1.48.0"
+proptest = "1.11.0"

@@ -14,12 +14,16 @@ use sea_orm::{
     query::{QueryOrder, QuerySelect},
 };
 use std::{
+    cmp::Ordering,
     ops::Deref,
     sync::{Arc, LazyLock},
 };
 
 static COLLATOR: LazyLock<CollatorBorrowed<'static>> =
     LazyLock::new(|| Collator::try_new(locale!("hu").into(), CollatorOptions::default()).unwrap());
+
+/// Title ignored at the start of a name when sorting.
+const TITLE_PREFIX: &str = "Dr. ";
 
 /// A staff member or colleague.
 #[derive(SimpleObject, Debug, FromQueryResult)]
@@ -60,6 +64,22 @@ impl Colleague {
     }
 }
 
+/// Orders colleague names the way the staff page lists them.
+///
+/// Names are compared with Hungarian collation rules: the digraphs "cs", "gy",
+/// "sz", "zs" and friends sort as letters of their own, and long vowels sort
+/// together with their short pair (a/á, o/ó, ö/ő, ...). A leading "Dr. " title
+/// is ignored.
+///
+/// * `a` - first name to compare, as stored in the database.
+/// * `b` - second name to compare, as stored in the database.
+fn compare_names(a: &str, b: &str) -> Ordering {
+    let a = a.strip_prefix(TITLE_PREFIX).unwrap_or(a);
+    let b = b.strip_prefix(TITLE_PREFIX).unwrap_or(b);
+
+    COLLATOR.compare(a, b)
+}
+
 #[derive(Default)]
 pub struct ColleaguesQuery;
 
@@ -86,17 +106,68 @@ impl ColleaguesQuery {
             .map_err(db_error)?;
 
         if ctx.look_ahead().field("name").exists() {
-            res.sort_by(|a, b| {
-                let a = a.name.as_ref().unwrap();
-                let b = b.name.as_ref().unwrap();
-
-                let a_name = a.strip_prefix("Dr. ").unwrap_or(a);
-                let b_name = b.strip_prefix("Dr. ").unwrap_or(b);
-
-                COLLATOR.compare(a_name, b_name)
-            });
+            res.sort_by(|a, b| compare_names(a.name.as_ref().unwrap(), b.name.as_ref().unwrap()));
         }
 
         Ok(res)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    fn sorted<'a>(names: &[&'a str]) -> Vec<&'a str> {
+        let mut names = names.to_vec();
+        names.sort_by(|a, b| compare_names(a, b));
+        names
+    }
+
+    #[test]
+    fn title_is_ignored() {
+        // Byte order would put "Csaba" first because "C" < "D".
+        assert_eq!(
+            sorted(&["Csaba Kiss", "Dr. Béla Tóth"]),
+            ["Dr. Béla Tóth", "Csaba Kiss"]
+        );
+    }
+
+    #[test]
+    fn digraphs_sort_after_every_word_on_their_first_letter() {
+        assert_eq!(
+            sorted(&["Csaba", "Cukor", "Cirkó"]),
+            ["Cirkó", "Cukor", "Csaba"]
+        );
+        assert_eq!(
+            sorted(&["Gyula", "Guszti", "Gábor"]),
+            ["Gábor", "Guszti", "Gyula"]
+        );
+        assert_eq!(
+            sorted(&["Sztojka", "Sütő", "Szabó"]),
+            ["Sütő", "Szabó", "Sztojka"]
+        );
+        assert_eq!(sorted(&["Zsolt", "Zuzana"]), ["Zuzana", "Zsolt"]);
+    }
+
+    #[test]
+    fn long_vowels_sort_with_their_short_pair() {
+        assert_eq!(sorted(&["Adorján", "Ádám"]), ["Ádám", "Adorján"]);
+        assert_eq!(sorted(&["Örs", "Őri"]), ["Őri", "Örs"]);
+    }
+
+    #[test]
+    fn o_with_diaeresis_is_a_separate_letter_after_o() {
+        assert_eq!(
+            sorted(&["Őry", "Ozsvár", "Óvári", "Oláh"]),
+            ["Oláh", "Óvári", "Ozsvár", "Őry"]
+        );
+    }
+
+    proptest! {
+        #[test]
+        fn comparison_is_antisymmetric(a in any::<String>(), b in any::<String>()) {
+            prop_assert_eq!(compare_names(&a, &b), compare_names(&b, &a).reverse());
+        }
     }
 }

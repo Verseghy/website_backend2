@@ -1,5 +1,5 @@
 use crate::select_columns;
-use crate::utils::Maybe;
+use crate::utils::{Maybe, iso_week_range};
 use crate::{
     entity::{
         canteen_data::{self, Entity as CanteenData},
@@ -10,7 +10,6 @@ use crate::{
     utils::db_error,
 };
 use async_graphql::{ComplexObject, Context, Object, Result, SimpleObject};
-use chrono::{NaiveDate, Weekday};
 use prometheus::{IntCounterVec, labels};
 use sea_orm::{
     DatabaseTransaction, FromQueryResult, JoinType,
@@ -87,8 +86,7 @@ impl CanteenQuery {
         select_columns!(ctx, query, canteen_data::Column);
         select_columns!(ctx, query, "menus" => canteen_data::Column::Id);
 
-        let start = NaiveDate::from_isoywd_opt(year, week as u32, Weekday::Mon).unwrap();
-        let end = NaiveDate::from_isoywd_opt(year, week as u32, Weekday::Sun).unwrap();
+        let (start, end) = iso_week_range(year, week).unwrap();
 
         query
             .filter(canteen_data::Column::Date.lte(end))
