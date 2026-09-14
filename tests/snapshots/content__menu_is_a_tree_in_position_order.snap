@@ -40,13 +40,6 @@ expression: response
         "name": "E-napló",
         "slug": null,
         "type": "external_link"
-      },
-      {
-        "children": [],
-        "link": "https://example.test/torolt",
-        "name": "Törölt menüpont",
-        "slug": null,
-        "type": "external_link"
       }
     ]
   },

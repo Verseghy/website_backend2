@@ -76,19 +76,39 @@ async fn menu_slug_does_not_depend_on_selecting_link() {
 }
 
 #[tokio::test]
-#[ignore = "bug: soft-deleted menu items are still listed"]
 async fn soft_deleted_menu_items_are_not_listed() {
+    use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, sea_query::Expr};
+    use website_backend2::entity::menu_items;
+
     let app = TestApp::seeded().await;
+    // The seed data only deletes a top-level item. Also delete "Régi oldal"
+    // (id 3), a child of "Iskolánk", to cover `children`.
+    menu_items::Entity::update_many()
+        .col_expr(
+            menu_items::Column::DeletedAt,
+            Expr::current_timestamp().into(),
+        )
+        .filter(menu_items::Column::Id.eq(3))
+        .exec(app.db())
+        .await
+        .expect("delete child menu item");
 
-    let response = app.graphql("{ menu { name } }").await;
+    let response = app.graphql("{ menu { name children { name } } }").await;
 
-    let names: Vec<&str> = expect_data(&response)["menu"]
-        .as_array()
-        .expect("menu")
-        .iter()
-        .filter_map(|item| item["name"].as_str())
-        .collect();
-    assert!(!names.contains(&seed::DELETED_MENU_ITEM), "{names:?}");
+    let names = |items: &Value| -> Vec<String> {
+        items
+            .as_array()
+            .expect("menu items")
+            .iter()
+            .filter_map(|item| item["name"].as_str().map(str::to_owned))
+            .collect()
+    };
+    let menu = &expect_data(&response)["menu"];
+    assert!(
+        !names(menu).contains(&seed::DELETED_MENU_ITEM.to_owned()),
+        "{menu:#}"
+    );
+    assert_eq!(names(&menu[0]["children"]), ["Rólunk"], "{menu:#}");
 }
 
 #[tokio::test]

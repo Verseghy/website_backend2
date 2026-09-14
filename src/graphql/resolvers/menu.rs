@@ -63,6 +63,7 @@ impl MenuItem {
 
         query
             .filter(Column::ParentId.eq(self.id.unwrap()))
+            .filter(Column::DeletedAt.is_null())
             .order_by(Column::Lft, Order::Asc)
             .into_model::<MenuItem>()
             .all(db.deref())
@@ -95,6 +96,9 @@ impl MenuQuery {
 
         query
             .filter(Column::ParentId.is_null())
+            // Menu items are soft-deleted: a deleted item keeps its row but gets
+            // `deleted_at`. The same filter applies to `children`.
+            .filter(Column::DeletedAt.is_null())
             .order_by(Column::Lft, Order::Asc)
             .into_model::<MenuItem>()
             .all(db.deref())
