@@ -59,7 +59,7 @@ expression: response
         ],
         "pageInfo": {
           "endCursor": "2026-02-13#6",
-          "hasPreviousPage": true
+          "hasPreviousPage": false
         }
       }
     }

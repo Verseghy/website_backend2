@@ -239,7 +239,6 @@ async fn paging_through_posts_visits_every_published_post_once() {
 }
 
 #[tokio::test]
-#[ignore = "bug: pageInfo of filtered post lists is computed from all published posts"]
 async fn page_info_of_a_filtered_list_reflects_the_filter() {
     // Post 2 is the only post labelled "Sport", so there is nothing before or after it.
     let app = TestApp::seeded().await;
