@@ -128,7 +128,6 @@ async fn introspection_query_is_answered() {
 }
 
 #[tokio::test]
-#[ignore = "bug: operations named IntrospectionQuery run without a database transaction and panic when they select data"]
 async fn operation_named_introspection_query_can_select_data() {
     let app = TestApp::seeded().await;
 

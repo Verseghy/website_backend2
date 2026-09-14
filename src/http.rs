@@ -17,10 +17,9 @@ const GRAPHQL_PATH: &str = "/graphql";
 async fn graphql(State(state): State<AppState>, request: GraphQLRequest) -> GraphQLResponse {
     let request = request.into_inner();
 
-    if request.operation_name == Some("IntrospectionQuery".into()) {
-        return state.schema.execute(request).await.into();
-    }
-
+    // Every operation, including introspection, runs with the transaction and
+    // context data the resolvers expect. The operation name is chosen by the
+    // client, so it cannot be used to skip them.
     let res = match state.database.begin().await {
         Ok(tx) => {
             let tx = Arc::new(tx);
