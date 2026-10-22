@@ -2,10 +2,9 @@ use super::Post;
 use crate::{
     entity::posts_data::{Column, Entity as PostsData},
     select_columns,
-    utils::db_error,
+    utils::{db_error, month_range},
 };
 use async_graphql::{Context, Error, Object, Result, SimpleObject};
-use chrono::NaiveDate;
 use prometheus::{IntCounterVec, labels};
 use sea_orm::{
     DatabaseTransaction, FromQueryResult,
@@ -47,19 +46,7 @@ impl Archive {
             "author" => Column::AuthorId,
             "labels" => Column::Id);
 
-        let start = NaiveDate::from_ymd_opt(year, month, 1)
-            .ok_or_else(|| Error::new("invalid date"))?
-            .and_hms_opt(0, 0, 0)
-            .unwrap();
-
-        let end = if month < 12 {
-            NaiveDate::from_ymd_opt(year, month + 1, 1)
-        } else {
-            NaiveDate::from_ymd_opt(year + 1, 1, 1)
-        }
-        .ok_or_else(|| Error::new("invalid date"))?
-        .and_hms_opt(0, 0, 0)
-        .unwrap();
+        let (start, end) = month_range(year, month).ok_or_else(|| Error::new("invalid date"))?;
 
         query
             .filter(Column::Date.gte(start))
